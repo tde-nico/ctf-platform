@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  platform:
+    build: .
+    restart: unless-stopped
+    ports:
+      - 8888:8888
+    volumes:
+      - ./database.db:/srv/database.db
+      - ./files:/srv/files
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.201.104.0/24
+          gateway: 10.201.104.1
