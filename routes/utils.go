@@ -6,7 +6,6 @@ import (
 	"platform/db"
 	"platform/log"
 	"regexp"
-	"strings"
 	"text/template"
 
 	"github.com/gorilla/sessions"
@@ -24,11 +23,11 @@ type Data struct {
 	Flashes     []Flash
 }
 
-const SEPARATOR = "|"
 const MAX_PASSWORD_LENGTH = 6
 
 var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
 
+// ! TODO: change
 var store = sessions.NewCookieStore([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
 
 func getSession(w http.ResponseWriter, r *http.Request) (*sessions.Session, bool) {
@@ -78,7 +77,6 @@ func getFlashes(w http.ResponseWriter, r *http.Request, s *sessions.Session) []F
 	tmp := s.Flashes()
 	flashes := make([]Flash, len(tmp))
 	for i, flash := range tmp {
-		log.Infof("%+v", flash)
 		flashes[i] = *flash.(*Flash)
 	}
 	err := s.Save(r, w)
@@ -89,6 +87,7 @@ func getFlashes(w http.ResponseWriter, r *http.Request, s *sessions.Session) []F
 }
 
 func getTemplate(w http.ResponseWriter, page string) (*template.Template, error) {
+	// TODO: parse all templates at startup
 	tmpl, err := template.New("").ParseFiles("templates/base.html", fmt.Sprintf("templates/%s.html", page))
 	if err != nil {
 		log.Errorf("Error parsing template %v", err)
@@ -106,59 +105,4 @@ func executeTemplate(w http.ResponseWriter, r *http.Request, s *sessions.Session
 		log.Errorf("Error executing template %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
-}
-
-func isRegistrationAllowed(w http.ResponseWriter, r *http.Request, s *sessions.Session) bool {
-	allowed := db.GetConfig("registration-allowed")
-	if allowed == nil || *allowed == 0 {
-		addFlash(s, "Registration is disabled")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return false
-	}
-	return true
-}
-
-func isUserDataValid(s *sessions.Session, username, email, password string) bool {
-	if len(password) < MAX_PASSWORD_LENGTH {
-		addFlash(s, "Password is too short")
-		return false
-	}
-
-	if strings.ToLower(username) == "admin" {
-		addFlash(s, "Username is reserved")
-		return false
-	}
-
-	if !USERNAME_REGEX.MatchString(username) {
-		addFlash(s, "Invalid username")
-		return false
-	}
-
-	if db.UserExists(username) {
-		addFlash(s, "Username already taken")
-		return false
-	}
-
-	if db.EmailExists(email) {
-		addFlash(s, "Email already taken")
-		return false
-	}
-
-	return true
-}
-
-func loginUser(s *sessions.Session, username, password string) (*db.User, error) {
-	username = strings.TrimSpace(username)
-	if !USERNAME_REGEX.MatchString(username) {
-		addFlash(s, "Invalid username")
-		return nil, fmt.Errorf("invalid username")
-	}
-
-	user, err := db.LoginUser(username, password)
-	if err != nil {
-		addFlash(s, "Invalid username or password")
-		return nil, err
-	}
-
-	return user, nil
 }
