@@ -4,24 +4,11 @@ import (
 	"net/http"
 	"platform/db"
 	"platform/log"
-	"text/template"
 )
 
-type Flash struct {
-	Message string
-	Type    string
-}
-
-type Data struct {
-	User    *db.User
-	Flashes []Flash
-}
-
 func home(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.New("").ParseFiles("templates/base.html", "templates/home.html")
+	tmpl, err := getTemplate(w, "home")
 	if err != nil {
-		log.Errorf("Error parsing home template %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -37,19 +24,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		User: user,
 	}
 
-	flash, err := getFlash(w, r)
-	if err != nil {
-		return
-	}
-	if flash != nil {
-		data.Flashes = append(data.Flashes, *flash)
-	}
-
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		log.Errorf("Error executing home template %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	executeTemplate(w, r, tmpl, &data)
 }
 
 func register_get(w http.ResponseWriter, r *http.Request) {
@@ -59,27 +34,12 @@ func register_get(w http.ResponseWriter, r *http.Request) {
 
 	// ! TODO: redirect if session
 
-	tmpl, err := template.New("").ParseFiles("templates/base.html", "templates/register.html")
-	if err != nil {
-		log.Errorf("Error parsing register template %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	data := Data{}
-	flash, err := getFlash(w, r)
+	tmpl, err := getTemplate(w, "register")
 	if err != nil {
 		return
 	}
-	if flash != nil {
-		data.Flashes = append(data.Flashes, *flash)
-	}
 
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		log.Errorf("Error executing home template %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	executeTemplate(w, r, tmpl, &Data{})
 }
 
 func register_post(w http.ResponseWriter, r *http.Request) {
@@ -107,4 +67,32 @@ func register_post(w http.ResponseWriter, r *http.Request) {
 
 	setFlash(w, "success", "Registration Completed")
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func login_get(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := getTemplate(w, "login")
+	if err != nil {
+		return
+	}
+
+	// ! TODO: redirect if session
+
+	executeTemplate(w, r, tmpl, &Data{})
+}
+
+func login_post(w http.ResponseWriter, r *http.Request) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	apiKey, err := loginUser(w, username, password)
+	if err != nil {
+		log.Errorf("Error logging in: %v", err)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	// ! TODO create session
+	log.Infof("Login post %s", apiKey)
+
+	http.Redirect(w, r, "/challenges", http.StatusSeeOther)
 }

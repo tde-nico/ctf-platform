@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"platform/log"
 	"platform/utils"
 )
@@ -68,9 +69,44 @@ func RegisterUser(username, email, password string) error {
 		return err
 	}
 	secretHex := utils.HashPassword(password, salt)
-	err = createUser(username, email, string(secretHex), string(saltHex), string(apiKeyHex))
+	err = createUser(username, email, string(saltHex), string(secretHex), string(apiKeyHex))
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func LoginUser(username, password string) (string, error) {
+	if db == nil {
+		return "", fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT apikey, salt, password FROM users WHERE username = ?", username)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		log.Errorf("User not found")
+		return "", fmt.Errorf("user not found")
+	}
+
+	var apiKey, saltHex, secretHex string
+	err = rows.Scan(&apiKey, &saltHex, &secretHex)
+	if err != nil {
+		return "", err
+	}
+
+	salt, err := utils.HexToBytes(saltHex)
+	if err != nil {
+		return "", err
+	}
+
+	hash := utils.HashPassword(password, salt)
+	if secretHex != hash {
+		return "", fmt.Errorf("invalid password")
+	}
+
+	return apiKey, nil
 }

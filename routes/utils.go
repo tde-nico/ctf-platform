@@ -1,12 +1,24 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"platform/db"
 	"platform/log"
 	"regexp"
 	"strings"
+	"text/template"
 )
+
+type Flash struct {
+	Message string
+	Type    string
+}
+
+type Data struct {
+	User    *db.User
+	Flashes []Flash
+}
 
 const SEPARATOR = "|"
 const MAX_PASSWORD_LENGTH = 6
@@ -38,6 +50,32 @@ func getFlash(w http.ResponseWriter, r *http.Request) (*Flash, error) {
 		}
 	}
 	return nil, nil
+}
+
+func getTemplate(w http.ResponseWriter, page string) (*template.Template, error) {
+	tmpl, err := template.New("").ParseFiles("templates/base.html", fmt.Sprintf("templates/%s.html", page))
+	if err != nil {
+		log.Errorf("Error parsing template %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return nil, err
+	}
+	return tmpl, nil
+}
+
+func executeTemplate(w http.ResponseWriter, r *http.Request, tmpl *template.Template, data *Data) {
+	flash, err := getFlash(w, r)
+	if err != nil {
+		return
+	}
+	if flash != nil {
+		data.Flashes = append(data.Flashes, *flash)
+	}
+
+	err = tmpl.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		log.Errorf("Error executing template %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
 func isRegistrationAllowed(w http.ResponseWriter, r *http.Request) bool {
@@ -77,4 +115,20 @@ func isUserDataValid(w http.ResponseWriter, username, email, password string) bo
 	}
 
 	return true
+}
+
+func loginUser(w http.ResponseWriter, username, password string) (string, error) {
+	username = strings.TrimSpace(username)
+	if !USERNAME_REGEX.MatchString(username) {
+		setFlash(w, "danger", "Invalid username")
+		return "", fmt.Errorf("invalid username")
+	}
+
+	apiKey, err := db.LoginUser(username, password)
+	if err != nil {
+		setFlash(w, "danger", "Invalid username or password")
+		return "", err
+	}
+
+	return apiKey, nil
 }

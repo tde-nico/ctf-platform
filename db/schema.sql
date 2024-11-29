@@ -1,10 +1,7 @@
-CREATE TABLE IF NOT EXISTS "solves" (
-	"userid" INTEGER NOT NULL,
-	"chalid" INTEGER NOT NULL,
-	timestamp DATETIME,
-	PRIMARY KEY ("userid", "chalid"),
-	FOREIGN KEY("userid") REFERENCES "users"("id"),
-	FOREIGN KEY("chalid") REFERENCES "challenges"("id")
+CREATE TABLE IF NOT EXISTS "config" (
+	"key" TEXT NOT NULL,
+	"value" INTEGER,
+	PRIMARY KEY("key")
 );
 
 CREATE TABLE IF NOT EXISTS "users" (
@@ -16,18 +13,6 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"apikey" VARCHAR(256) NOT NULL,
 	"score" INTEGER NOT NULL DEFAULT 0,
 	"is_admin" BOOLEAN NOT NULL DEFAULT 0 CHECK("is_admin" IN (0, 1)),
-	PRIMARY KEY("id")
-);
-
-CREATE TABLE IF NOT EXISTS "submissions" (
-	"id" INTEGER NOT NULL,
-	"userid" INTEGER,
-	"chalid" INTEGER,
-	"status" VARCHAR(1),
-	"flag" TEXT,
-	"timestamp" DATETIME,
-	FOREIGN KEY("chalid") REFERENCES "challenges"("id"),
-	FOREIGN KEY("userid") REFERENCES "users"("id"),
 	PRIMARY KEY("id")
 );
 
@@ -51,8 +36,23 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 	PRIMARY KEY("id")
 );
 
-CREATE TABLE IF NOT EXISTS "config" (
-	"key" TEXT NOT NULL,
-	"value" INTEGER,
-	PRIMARY KEY("key")
+CREATE TABLE IF NOT EXISTS "solves" (
+	"userid" INTEGER NOT NULL,
+	"chalid" INTEGER NOT NULL,
+	timestamp DATETIME,
+	PRIMARY KEY ("userid", "chalid"),
+	FOREIGN KEY("userid") REFERENCES "users"("id"),
+	FOREIGN KEY("chalid") REFERENCES "challenges"("id")
+);
+
+CREATE TABLE IF NOT EXISTS "submissions" (
+	"id" INTEGER NOT NULL,
+	"userid" INTEGER,
+	"chalid" INTEGER,
+	"status" VARCHAR(1),
+	"flag" TEXT,
+	"timestamp" DATETIME,
+	FOREIGN KEY("chalid") REFERENCES "challenges"("id"),
+	FOREIGN KEY("userid") REFERENCES "users"("id"),
+	PRIMARY KEY("id")
 );
