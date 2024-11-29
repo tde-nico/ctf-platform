@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container mt-5">
+    <h3 class="mb-4">Password reset</h3>
+    <h5 class="mb-4">An administrator requested that you reset your password</h5>
+    </br>
+    <form action="/newpw" method="post">
+        <p>
+        <input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password" required>
+        </p>
+        <p>
+        <input class="btn btn-primary" value="Confirm" type="submit">
+        </p>
+    </form>
+    </div>
+{% endblock %}

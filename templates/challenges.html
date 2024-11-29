@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="my-5 text-center">
+    <h2>Challenges</h2>
+</div>
+
+{% for category, challs in challenges %} {% if is_visible_category(challs) or user.is_admin %}
+    <h3 class="ml-5 mt-5"> {{ category.capitalize() }} </h3>
+    <div class="row mx-auto mb-5" style="width:95%">
+        {% for chal in challs %}
+        {% if not chal.hidden or user.is_admin %}
+        <div class="col-md-3 py-5">
+            {% if (user.id, chal.id) not in solves %}
+                <button class="btn {% if chal.hidden %} btn-secondary {% else %} btn-dark {% endif %} w-100 h-100 chalpreview my-2" name="{{ chal.id }}" {% if chal.is_extra %} style="background-color: #D6AD78" {% endif %}>
+            {% else %}
+                <button class="btn w-100 h-100 chalpreview my-2" name="{{ chal.id }}" style="background-color: palegreen">
+            {% endif %}
+                    {% if chal.is_extra %}
+                        <div class="animated-rainbow">EXTRA</div>
+                    {% endif %}
+                    <h4> {{ chal.name }} {% if chal.hidden %}<i class="fa fa-eye-slash" aria-hidden="true"></i>{% endif %} </h4>
+                    <h5> {{ chal.points }} ({{ chal.difficulty }})</h5>
+                </button>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+{% endif %} {% endfor %}
+
+{% for category, challs in challenges %}
+    {% for chal in challs %}
+        {% if not chal.hidden or user.is_admin %}
+<div class="d-none {{ chal.id }} challtoggle position-fixed" style="width: 35%; top:50%; left:50%; transform: translate(-50%, -50%); border: 0px solid black; background-color: GhostWhite; border-radius:10px; color: DimGrey; box-shadow: 0px 0px 10px #888888;">
+    <div class="text-center">
+        <h1 class="mt-4"> {{ chal.name }} </h1>
+        <h3> Solves: {{ chal.solves }} </h3>
+        <h4> Points: {{ chal.points }} </h4>
+
+        <div class="mt-5 mb-3 ml-3 mr-3" style="text-decoration: none;">
+        {% set rows = chal.description.split('\n') %}
+        {% for row in rows %}
+            <h6 class="mb-0">{{ row | safe }}</h6>
+        {% endfor %}
+        </div>
+
+        {% if chal.files %}
+            </br>
+            {% set files = chal.files.split(',') %}
+            {% for file in files %}
+                <h6>
+                    <a href="{{ file }}" style="color: grey; text-decoration: none;">
+                        <i class="fa fa-download download_icon" aria-hidden="true"></i> {{ file.split("/")[-1] }} </a>
+                </h6>
+            {% endfor %}
+        {% endif %}
+        {% if chal.host and chal.port %}
+            <h6 class="my-3"> nc {{ chal.host }} {{ chal.port }} </h6>
+        {% endif %}
+        {% if chal.hint1 %}
+            <p class="mt-5 mb-3">&bull; {{ chal.hint1 | safe }} </p>
+        {% endif %}
+        {% if chal.hint2 %}
+            <p class="my-3">&bull; {{ chal.hint2 | safe }} </p>
+        {% endif %}
+        {% if (user.id, chal.id) not in solves %}
+            <form class="mb-4" action="/submit" method="POST">
+                <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
+                    <input type="hidden" name="challID" value="{{ chal.id }}">
+                    <input type="text" class="form-control challenge-flag" placeholder="flag" name="flag">
+                    <div class="input-group-append">
+                        <button class="btn" type="submit" method="POST" style="background-color: silver">Submit</button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <h6 class="my-4"> Challenge already solved</h6>
+        {% endif %}
+        </div>
+</div>
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+<script>
+    $(".chalpreview").click(function(e) {
+        var modal = $("div." + e.currentTarget.name);
+        modal.removeClass("d-none");
+        var contents = modal.contents().find(".challenge-flag");
+        if(contents.length > 0) {
+            contents[0].focus();
+        }
+        e.preventDefault();
+    });
+
+    $(document).mouseup(function(e) {
+        var container = $("div.challtoggle");
+
+        if (!container.is(e.target) && container.has(e.target).length === 0) {
+            container.addClass("d-none");
+        }
+    });
+</script>
+
+{% endblock %}

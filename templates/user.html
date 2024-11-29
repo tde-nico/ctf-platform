@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-5">
+  <h3 class="my-5">Player profile</h3>
+  <br>
+  <p>Username: {{ user_profile.username }}</p>
+
+  {% if user.id == user_profile.id or user.is_admin %}
+    <p>Email: {{ user_profile.email }}</p>
+  {% endif %}
+
+  <p>Points: {{ user_profile.score }}</p>
+  {% if solves %}
+    <p class="mb-4">Solves: {{ solves|length }}</p>
+    <table class="table">
+      <thead>
+          <tr>
+            <th scope="col">Challenge</th>
+            <th scope="col">Timestamp</th>
+          </tr>
+        </thead>
+      {% for s in solves %}
+        <tr>
+          <td>{{ s.chal.name }}</td>
+          <td>{{ s.timestamp.strftime('%H:%M %d-%m-%Y') }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p class="mb-4">Solves: 0</p>
+  {% endif %}
+  </div>
+{% endblock %}

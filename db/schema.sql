@@ -7,14 +7,6 @@ CREATE TABLE IF NOT EXISTS "solves" (
 	FOREIGN KEY("chalid") REFERENCES "challenges"("id")
 );
 
-CREATE TABLE IF NOT EXISTS "notifications" (
-	"id" INTEGER NOT NULL,
-	"user" INTEGER,
-	"text" TEXT,
-	PRIMARY KEY ("id"),
-	FOREIGN KEY("user") REFERENCES "users"("id")
-);
-
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" INTEGER NOT NULL,
 	"username" VARCHAR(32) UNIQUE NOT NULL,
@@ -22,8 +14,8 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"salt" VARCHAR(16) NOT NULL,
 	"password" VARCHAR(64) NOT NULL,
 	"apikey" VARCHAR(256) NOT NULL,
-	"score" INTEGER NOT NULL,
-	"is_admin" BOOLEAN NOT NULL CHECK("is_admin" IN (0, 1)),
+	"score" INTEGER NOT NULL DEFAULT 0,
+	"is_admin" BOOLEAN NOT NULL DEFAULT 0 CHECK("is_admin" IN (0, 1)),
 	PRIMARY KEY("id")
 );
 
@@ -61,8 +53,6 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 
 CREATE TABLE IF NOT EXISTS "config" (
 	"key" TEXT NOT NULL,
-	"type" TEXT NOT NULL DEFAULT 'text',
 	"value" INTEGER,
-	"desc" TEXT,
 	PRIMARY KEY("key")
 );

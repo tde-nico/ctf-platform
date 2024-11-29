@@ -1,0 +1,125 @@
+{% extends "base.html" %} {% block content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+
+<div class="container my-5">
+    <div>
+        <canvas id="chart"></canvas>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h3>Hall of Fame</h3>
+    <br>
+    <table class="table table-hover">
+        <thead>
+            <tr class="table-default">
+                <th scope="col">Username</th>
+                <th scope="col">Score</th>
+            </tr>
+        </thead>
+        <tbody class="my-5">
+            <tr height="15px"></tr>
+
+            {% for user in users %}
+            <tr class="table-dark" style="color:black">
+                <th scope="row">
+
+                    {% if loop.index < 4 %}
+
+                        {% if loop.index == 1 %}
+                        <img src="static/images/crown-gold.png" class="img-responsive rank-crown" />
+                        {% elif loop.index == 2 %}
+                        <img src="static/images/crown-silver.png" class="img-responsive rank-crown" />
+                        {% elif loop.index == 3 %}
+                        <img src="static/images/crown-bronze.png" class="img-responsive rank-crown" />
+                        {% endif %}
+
+                        <a href="/user/{{ user[0] }}" style="color: black;">{{ user[0] }}</a>
+                    
+                    {% else %}
+                        {{ loop.index }}.
+                        <a href="/user/{{ user[0] }}" style="color: black;">{{ user[0] }}</a>
+                    {% endif %}
+
+                    {% for badge in user[3] %}
+                        <span class="category_badge {% if badge[1] %}extra-badge{% endif %}" data-toggle="tooltip" data-placement="top" title="{{ user[0] }} solved all the currently available {{ badge[0] }} challenges!">
+                            {{ badge[0][0] }}
+                        </span>
+                    {% endfor %}
+
+                </th>
+                <td>{{ user[1] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript">
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+<script>
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+$.ajax('/graph_data', {
+    type: 'POST',
+    success: function(data, status, xhr) {
+        data = JSON.parse(data);
+        console.log(data);
+        var alldata = []
+        for (var key in data) {
+            var ds = {
+                label: key,
+                borderColor: getRandomColor(),
+                data: data[key],
+                fill: false
+
+            };
+            alldata.push(ds);
+
+        }
+        console.log(alldata);
+        var ctx = document.getElementById('chart').getContext('2d');
+        var chart = new Chart(ctx, {
+            elements: {
+                line: {
+                    lineTension: 0,
+                    bezierCurve: false
+                }
+            },
+            type: 'line',
+            data: {
+                datasets: alldata
+            },
+            options: {
+                fill: false,
+                scales: {
+                    xAxes: [{
+                        type: 'time'
+                    }]
+                },
+                legend: {
+                    fontStyle: 'Monospace',
+                    position: 'bottom'
+                },
+                elements: {
+                    line: {
+                        tension: 0
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

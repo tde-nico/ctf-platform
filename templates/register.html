@@ -1,0 +1,12 @@
+{{define "content"}}
+<div class="container mt-5">
+    <h3 class="mb-4">Registration</h3>
+    </br>
+    <form action="/register" method="post">
+        <p><input type="text" name="username" class="form-control" placeholder="Username" aria-label="Username" required></p>
+        <p><input type="email" name="email" class="form-control" placeholder="Email" aria-label="Email" required></p>
+        <p><input type="password" name="password" class="form-control" placeholder="Password" aria-label="Password" required></p>
+        <p><input class="btn btn-primary" value="Register" type="submit"></p>
+    </form>
+</div>
+{{ end }}

@@ -1,0 +1,94 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>CyberChallenge CTF Platform</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap4-toggle.min.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="icon" href="/static/images/cc_logo.png">
+    <script src="/static/js/jquery-3.4.1.min.js"></script>
+    <script src="/static/js/popper.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/bootstrap4-toggle.min.js"></script>
+</head>
+
+<body style="font-family: monospace">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/" style="color: grey">
+            <img src="/static/images/cc_logo.png" alt="" style="height: 2em;">
+            Cyber Challenge Sapienza CTF
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbartoggler" aria-controls="navbartoggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbartoggler">
+            <ul class="navbar-nav ml-auto">
+
+            {{ if .User }}
+                <li class="nav-item my-auto mx-5">
+                    <a class="nav-link" href="/user/{{ .User.Username }}">{{ .User.Username }} - {{ .User.Score }} points</a>
+                </li>
+
+                {{ if .User.IsAdmin }}
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/admin">Control Panel</a>
+                </li>
+                {{ end }}
+
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/scores">Scores</a>
+                </li>
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/challenges">Challenges</a>
+                </li>
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/logout">Logout</a>
+                </li>
+            {{ else }}
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/register">Registration</a>
+                </li>
+                <li class="nav-item my-auto">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+            {{ end }}
+            
+            </ul>
+        </div>
+    </nav>
+
+    {{ with .Flashes }}
+        {{ range . }}
+            <div class="alert alert-{{ .Type }} alert-dismissible fade show">
+                <strong>{{ .Message }}</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {{ end }}
+    {{ end }}
+
+    <div class="w-100">
+        <br> {{template "content" .}}
+        <br>
+    </div>
+    <script>
+        $(".notification-button").click(function(e) {
+            var id = $(this).attr("notif-id");
+            $.ajax({
+                url: '/remove_notification',
+                type: 'POST',
+                data: {'id':id}
+            });
+        });
+    </script>
+</body>
+</html>
+{{end}}
