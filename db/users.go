@@ -76,37 +76,47 @@ func RegisterUser(username, email, password string) error {
 	return nil
 }
 
-func LoginUser(username, password string) (string, error) {
+func LoginUser(username, password string) (*User, error) {
 	if db == nil {
-		return "", fmt.Errorf("database not initialized")
+		return nil, fmt.Errorf("database not initialized")
 	}
 
-	rows, err := db.Query("SELECT apikey, salt, password FROM users WHERE username = ?", username)
+	rows, err := db.Query("SELECT * FROM users WHERE username = ?", username)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
 		log.Errorf("User not found")
-		return "", fmt.Errorf("user not found")
+		return nil, fmt.Errorf("user not found")
 	}
 
-	var apiKey, saltHex, secretHex string
-	err = rows.Scan(&apiKey, &saltHex, &secretHex)
+	var user User
+	var saltHex, secretHex string
+	err = rows.Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+		&saltHex,
+		&secretHex,
+		&user.Apikey,
+		&user.Score,
+		&user.IsAdmin,
+	)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	salt, err := utils.HexToBytes(saltHex)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	hash := utils.HashPassword(password, salt)
 	if secretHex != hash {
-		return "", fmt.Errorf("invalid password")
+		return nil, fmt.Errorf("invalid password")
 	}
 
-	return apiKey, nil
+	return &user, nil
 }

@@ -8,6 +8,8 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+
+	"github.com/gorilla/sessions"
 )
 
 type Flash struct {
@@ -16,8 +18,10 @@ type Flash struct {
 }
 
 type Data struct {
-	User    *db.User
-	Flashes []Flash
+	User        *db.User
+	UserProfile *db.User
+	Solves      []db.Solve
+	Flashes     []Flash
 }
 
 const SEPARATOR = "|"
@@ -25,31 +29,63 @@ const MAX_PASSWORD_LENGTH = 6
 
 var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
 
-func setFlash(w http.ResponseWriter, t string, msg string) {
-	http.SetCookie(w, &http.Cookie{
-		Name:  "flash",
-		Value: strings.Join([]string{t, msg}, SEPARATOR),
-	})
+var store = sessions.NewCookieStore([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
+
+func getSession(w http.ResponseWriter, r *http.Request) (*sessions.Session, bool) {
+	session, err := store.Get(r, "session")
+	if err != nil {
+		log.Errorf("Error getting session: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return nil, false
+	}
+	return session, true
 }
 
-// ! TODO make it return a slice of flashes
-func getFlash(w http.ResponseWriter, r *http.Request) (*Flash, error) {
-	cookie, err := r.Cookie("flash")
-	if err != nil && err != http.ErrNoCookie {
-		log.Errorf("Error getting flash cookie %v", err)
+func saveSession(w http.ResponseWriter, r *http.Request, s *sessions.Session) bool {
+	err := s.Save(r, w)
+	if err != nil {
+		log.Errorf("Error saving session: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return nil, err
-	} else if err == nil {
-		flashParts := strings.SplitN(cookie.Value, SEPARATOR, 2)
-		http.SetCookie(w, &http.Cookie{Name: "flash", MaxAge: -1})
-		if len(flashParts) == 2 {
-			return &Flash{
-				Message: flashParts[1],
-				Type:    flashParts[0],
-			}, nil
-		}
+		return false
 	}
-	return nil, nil
+	return true
+}
+
+func getSessionUser(s *sessions.Session) *db.User {
+	val := s.Values["user"]
+	var user = &db.User{}
+	user, ok := val.(*db.User)
+	if !ok {
+		return nil
+	}
+	return user
+}
+
+func addFlash(s *sessions.Session, args ...string) {
+	if len(args) < 1 || len(args) > 2 {
+		return
+	}
+	var flashType string
+	if len(args) == 1 {
+		flashType = "danger"
+	} else {
+		flashType = args[1]
+	}
+	s.AddFlash(&Flash{args[0], flashType})
+}
+
+func getFlashes(w http.ResponseWriter, r *http.Request, s *sessions.Session) []Flash {
+	tmp := s.Flashes()
+	flashes := make([]Flash, len(tmp))
+	for i, flash := range tmp {
+		log.Infof("%+v", flash)
+		flashes[i] = *flash.(*Flash)
+	}
+	err := s.Save(r, w)
+	if err != nil {
+		log.Errorf("Error saving session: %v", err)
+	}
+	return flashes
 }
 
 func getTemplate(w http.ResponseWriter, page string) (*template.Template, error) {
@@ -62,73 +98,67 @@ func getTemplate(w http.ResponseWriter, page string) (*template.Template, error)
 	return tmpl, nil
 }
 
-func executeTemplate(w http.ResponseWriter, r *http.Request, tmpl *template.Template, data *Data) {
-	flash, err := getFlash(w, r)
-	if err != nil {
-		return
-	}
-	if flash != nil {
-		data.Flashes = append(data.Flashes, *flash)
-	}
+func executeTemplate(w http.ResponseWriter, r *http.Request, s *sessions.Session, tmpl *template.Template, data *Data) {
+	data.Flashes = getFlashes(w, r, s)
 
-	err = tmpl.ExecuteTemplate(w, "base", data)
+	err := tmpl.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		log.Errorf("Error executing template %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 }
 
-func isRegistrationAllowed(w http.ResponseWriter, r *http.Request) bool {
+func isRegistrationAllowed(w http.ResponseWriter, r *http.Request, s *sessions.Session) bool {
 	allowed := db.GetConfig("registration-allowed")
 	if allowed == nil || *allowed == 0 {
-		setFlash(w, "danger", "Registration is disabled")
+		addFlash(s, "Registration is disabled")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return false
 	}
 	return true
 }
 
-func isUserDataValid(w http.ResponseWriter, username, email, password string) bool {
+func isUserDataValid(s *sessions.Session, username, email, password string) bool {
 	if len(password) < MAX_PASSWORD_LENGTH {
-		setFlash(w, "danger", "Password is too short")
+		addFlash(s, "Password is too short")
 		return false
 	}
 
 	if strings.ToLower(username) == "admin" {
-		setFlash(w, "danger", "Username is reserved")
+		addFlash(s, "Username is reserved")
 		return false
 	}
 
 	if !USERNAME_REGEX.MatchString(username) {
-		setFlash(w, "danger", "Invalid username")
+		addFlash(s, "Invalid username")
 		return false
 	}
 
 	if db.UserExists(username) {
-		setFlash(w, "danger", "Username already taken")
+		addFlash(s, "Username already taken")
 		return false
 	}
 
 	if db.EmailExists(email) {
-		setFlash(w, "danger", "Email already taken")
+		addFlash(s, "Email already taken")
 		return false
 	}
 
 	return true
 }
 
-func loginUser(w http.ResponseWriter, username, password string) (string, error) {
+func loginUser(s *sessions.Session, username, password string) (*db.User, error) {
 	username = strings.TrimSpace(username)
 	if !USERNAME_REGEX.MatchString(username) {
-		setFlash(w, "danger", "Invalid username")
-		return "", fmt.Errorf("invalid username")
+		addFlash(s, "Invalid username")
+		return nil, fmt.Errorf("invalid username")
 	}
 
-	apiKey, err := db.LoginUser(username, password)
+	user, err := db.LoginUser(username, password)
 	if err != nil {
-		setFlash(w, "danger", "Invalid username or password")
-		return "", err
+		addFlash(s, "Invalid username or password")
+		return nil, err
 	}
 
-	return apiKey, nil
+	return user, nil
 }

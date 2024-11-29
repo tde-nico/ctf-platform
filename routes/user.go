@@ -12,38 +12,53 @@ func home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ! TODO: get user from session
-	user := &db.User{
-		Username: "test",
-		Email:    "test@gmail.com",
-		Score:    1337,
-		IsAdmin:  true,
-	}
-	user = nil
-	data := Data{
-		User: user,
+	session, ok := getSession(w, r)
+	if !ok {
+		return
 	}
 
-	executeTemplate(w, r, tmpl, &data)
+	user := getSessionUser(session)
+
+	data := Data{User: user}
+	if r.RequestURI != "/" {
+		data.Flashes = append(data.Flashes, Flash{
+			Type:    "danger",
+			Message: "404 Page not found",
+		})
+	}
+
+	executeTemplate(w, r, session, tmpl, &data)
 }
 
 func register_get(w http.ResponseWriter, r *http.Request) {
-	if !isRegistrationAllowed(w, r) {
+	session, ok := getSession(w, r)
+	if !ok {
 		return
 	}
 
 	// ! TODO: redirect if session
+
+	if !isRegistrationAllowed(w, r, session) {
+		return
+	}
 
 	tmpl, err := getTemplate(w, "register")
 	if err != nil {
 		return
 	}
 
-	executeTemplate(w, r, tmpl, &Data{})
+	executeTemplate(w, r, session, tmpl, &Data{})
 }
 
 func register_post(w http.ResponseWriter, r *http.Request) {
-	if !isRegistrationAllowed(w, r) {
+	session, ok := getSession(w, r)
+	if !ok {
+		return
+	}
+
+	// ! TODO: redirect if session
+
+	if !isRegistrationAllowed(w, r, session) {
 		return
 	}
 
@@ -51,7 +66,10 @@ func register_post(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
-	if !isUserDataValid(w, username, email, password) {
+	if !isUserDataValid(session, username, email, password) {
+		if !saveSession(w, r, session) {
+			return
+		}
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
@@ -63,13 +81,21 @@ func register_post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ! TODO create session
+	addFlash(session, "Registration Completed", "success")
 
-	setFlash(w, "success", "Registration Completed")
+	if !saveSession(w, r, session) {
+		return
+	}
+
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
 func login_get(w http.ResponseWriter, r *http.Request) {
+	session, ok := getSession(w, r)
+	if !ok {
+		return
+	}
+
 	tmpl, err := getTemplate(w, "login")
 	if err != nil {
 		return
@@ -77,22 +103,63 @@ func login_get(w http.ResponseWriter, r *http.Request) {
 
 	// ! TODO: redirect if session
 
-	executeTemplate(w, r, tmpl, &Data{})
+	executeTemplate(w, r, session, tmpl, &Data{})
 }
 
 func login_post(w http.ResponseWriter, r *http.Request) {
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	// username := r.FormValue("username")
+	// password := r.FormValue("password")
+	username := "nonnon"
+	password := "nonnon"
 
-	apiKey, err := loginUser(w, username, password)
+	session, ok := getSession(w, r)
+	if !ok {
+		return
+	}
+
+	// ! TODO: redirect if session
+
+	user, err := loginUser(session, username, password)
 	if err != nil {
 		log.Errorf("Error logging in: %v", err)
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
-	// ! TODO create session
-	log.Infof("Login post %s", apiKey)
+	session.Values["user"] = user
+
+	if !saveSession(w, r, session) {
+		return
+	}
 
 	http.Redirect(w, r, "/challenges", http.StatusSeeOther)
 }
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	session, ok := getSession(w, r)
+	if !ok {
+		return
+	}
+
+	session.Options.MaxAge = -1
+
+	if !saveSession(w, r, session) {
+		return
+	}
+
+	http.Redirect(w, r, "/login", http.StatusFound)
+}
+
+// func user(w http.ResponseWriter, r *http.Request) {
+// 	tmpl, err := getTemplate(w, "user")
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	// ! TODO get users
+// 	log.Infof("User %s", r.PathValue("username"))
+
+// 	// ! TODO: FINISH
+
+// 	executeTemplate(w, r, tmpl, &Data{User: user, UserProfile: user2, Solves: solves})
+// }

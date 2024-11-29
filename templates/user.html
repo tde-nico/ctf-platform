@@ -1,17 +1,16 @@
-{% extends "base.html" %}
-{% block content %}
+{{define "content"}}
 <div class="container my-5">
   <h3 class="my-5">Player profile</h3>
   <br>
-  <p>Username: {{ user_profile.username }}</p>
+  <p>Username: {{ .UserProfile.Username }}</p>
 
-  {% if user.id == user_profile.id or user.is_admin %}
-    <p>Email: {{ user_profile.email }}</p>
-  {% endif %}
+  {{ if or (eq .User.Id .UserProfile.Id) .User.IsAdmin }}
+    <p>Email: {{ .UserProfile.Email }}</p>
+  {{ end }}
 
-  <p>Points: {{ user_profile.score }}</p>
-  {% if solves %}
-    <p class="mb-4">Solves: {{ solves|length }}</p>
+  <p>Points: {{ .UserProfile.Score }}</p>
+  {{ if .Solves }}
+    <p class="mb-4">Solves: {{ len .Solves }}</p>
     <table class="table">
       <thead>
           <tr>
@@ -19,15 +18,15 @@
             <th scope="col">Timestamp</th>
           </tr>
         </thead>
-      {% for s in solves %}
+      {{ range .Solves }}
         <tr>
-          <td>{{ s.chal.name }}</td>
-          <td>{{ s.timestamp.strftime('%H:%M %d-%m-%Y') }}</td>
+          <td>{{ .Chal.Name }}</td>
+            <td>{{ .Timestamp.Format "15:04 02-01-2006" }}</td>
         </tr>
-      {% endfor %}
+      {{ end }}
     </table>
-  {% else %}
+  {{ else }}
     <p class="mb-4">Solves: 0</p>
-  {% endif %}
+  {{ end }}
   </div>
-{% endblock %}
+{{ end }}
