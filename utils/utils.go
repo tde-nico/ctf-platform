@@ -40,6 +40,6 @@ func GetRand(size int) ([]byte, string, error) {
 }
 
 func HashPassword(password string, salt []byte) string {
-	secret := pbkdf2.Key([]byte(password), salt, 4096, 32, sha256.New)
+	secret := pbkdf2.Key([]byte(password), salt, 10000, 32, sha256.New)
 	return BytesToHex(secret)
 }

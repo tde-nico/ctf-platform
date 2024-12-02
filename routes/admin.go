@@ -10,7 +10,12 @@ import (
 
 type AdminPanelData struct {
 	Data
-	Config []*db.Config
+	Users        []*db.User
+	Categories   []string
+	Difficulties []string
+	Challenges   map[string][]*db.Challenge
+	Submissions  []*db.Submission
+	Config       []*db.Config
 }
 
 func admin(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
@@ -22,6 +27,30 @@ func admin(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	data := &AdminPanelData{}
 
 	data.User = getSessionUser(s)
+
+	data.Users, err = db.GetUsers()
+	if err != nil {
+		log.Errorf("Error getting users: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data.Categories = db.CATEGORIES
+	data.Difficulties = db.DIFFICULTIES
+
+	data.Challenges, err = db.GetChallenges()
+	if err != nil {
+		log.Errorf("Error getting challenges: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data.Submissions, err = db.GetSubmissions()
+	if err != nil {
+		log.Errorf("Error getting submissions: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	data.Config, err = db.GetConfigs()
 	if err != nil {
@@ -47,8 +76,12 @@ func adminUpdateChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 	log.Infof("adminUpdateChall")
 }
 
-func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	log.Infof("adminDeleteChall")
+// func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
+// 	log.Infof("adminDeleteChall")
+// }
+
+func adminResetPw(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
+	log.Infof("adminResetPw")
 }
 
 func adminConfig(w http.ResponseWriter, r *http.Request, s *sessions.Session) {

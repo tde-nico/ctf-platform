@@ -91,11 +91,11 @@ func StartRouting() {
 	// authHandleFunc("POST /newpw", home)
 
 	adminHandleFunc("GET /admin", admin)
-	adminHandleFunc("POST /admin/newchall", adminNewChall)
-	adminHandleFunc("POST /admin/updatechall", adminUpdateChall)
-	adminHandleFunc("POST /admin/deletechall", adminDeleteChall)
+	adminHandleFunc("POST /admin/newchal", adminNewChall)
+	adminHandleFunc("POST /admin/updatechal", adminUpdateChall)
+	// adminHandleFunc("POST /admin/deletechal", adminDeleteChall)
+	adminHandleFunc("POST /admin/resetpw", adminResetPw)
 	adminHandleFunc("POST /admin/config", adminConfig)
-	// adminHandleFunc("POST /admin/resetpw", home)
 	// TODO
 	// TODO
 

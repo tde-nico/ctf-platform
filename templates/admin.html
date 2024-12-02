@@ -4,12 +4,290 @@
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
+            <a class="nav-link active" id="challenges-tab" data-toggle="tab" href="#challenges" role="tab" aria-controls="challenges" aria-selected="true">Challenges</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="submissions-tab" data-toggle="tab" href="#submissions" role="tab" aria-controls="submissions" aria-selected="false">Submissions</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Users</a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuration</a>
         </li>
     </ul>
 
-        <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
+    <div class="tab-content" id="myTabContent">
 
+        <div class="tab-pane show active" id="challenges" role="tabpanel" aria-labelledby="challenges-tab">
+            <div class="mt-3">
+                <form class="challform mx-auto" action="/admin/newchal" method="POST" enctype="multipart/form-data">
+                    <h5>New challenge</h5>
+
+                    <div>
+                        <label for="challform-name">Name *</label>
+                        <input type="text" id="challform-name" name="name" required>
+                    </div>
+
+                    <div>
+                        <label for="challform-flag">Flag *</label>
+                        <input type="text" id="challform-flag" name="flag" required>
+                    </div>
+
+                    <div class="multifield">
+                        <div class="subfield">
+                            <label for="challform-points">Points *</label>
+                            <input type="number" min="0" id="challform-points" name="points" value="500" required>
+                        </div>
+                        <div class="subfield">
+                            <label for="challform-category">Category *</label>
+                            <select name="category" required>
+                                <option value="" disabled selected="true">Select...</option>
+                                {{ range .Categories }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <div class="subfield">
+                            <label for="challform-difficulty">Difficulty *</label>
+                            <select name="difficulty" required>
+                                <option value="" disabled selected="true">Select...</option>
+                                {{ range .Difficulties }}
+                                    <option value="{{ . }}">{{ . }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="challform-desc">Description</label>
+                        <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!"></textarea>
+                    </div>
+
+                    <div class="multifield">
+                        <div class="subfield">
+                            <label for="challform-hint1">Hint 1</label>
+                            <input type="text" id="challform-hint1" name="hint1">
+                        </div>
+                        <div class="subfield">
+                            <label for="challform-hint2">Hint 2</label>
+                            <input type="text"id="challform-hint2" name="hint2">
+                        </div>
+                    </div>
+
+                    <div class="multifield">
+                        <div class="subfield">
+                            <label for="challform-host">Host</label>
+                            <input type="text" id="challform-host" name="host">
+                        </div>
+                        <div class="subfield">
+                            <label for="challform-port">Port</label>
+                            <input type="number" min="0" max="65535" id="challform-port" name="port">
+                        </div>
+                    </div>
+
+                    <div class="multifield">
+                        <div class="subfield">
+                            <label for="challform-files">Files (.zip)</label>
+                            <input type="file" id="challform-files" name="files">
+                        </div>
+                        <div class="subfield">
+                            <label for="challform-hidden">Hidden</label>
+                            <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="challform-extra">Extra</label>
+                        <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mx-auto">Create challenge</button>
+                </form>
+            </div>
+
+            <br />
+
+            <div id="challenges-accordion" class="mx-1 mt-1">
+            {{ $diffs := .Difficulties }}
+            {{ $cats := .Categories }}
+            
+            {{ range $cat, $chals := .Challenges }}
+            <br/>
+            <h5> {{ $cat }} </h5>
+            <hr style="height:2px">
+        
+                {{ range $i, $chal := $chals }}
+
+                <div class="card">
+                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-toggle="collapse" data-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}">
+                        {{ .Name }} {{ if .Hidden }} <i class="fa fa-eye-slash" aria-hidden="true"></i> {{ end }} 
+                    </div>
+                    <div id="collapse-{{ .Category }}-{{ $i }}" class="collapse" aria-labelledby="heading-{{ .Category }}-{{ $i }}" data-parent="#challenges-accordion">
+                        <div class="card-body">
+                            <form class="challform mx-auto" style="width: 95%" action="/admin/updatechal" method="POST" enctype="multipart/form-data">
+
+                                <div>
+                                    <label for="challform-name">Name *</label>
+                                    <input type="text" id="challform-name" name="name" required value="{{ .Name }}">
+                                </div>
+
+                                <div>
+                                    <label for="challform-flag">Flag *</label>
+                                    <input type="text" id="challform-flag" name="flag" required value="{{ .Flag }}">
+                                </div>
+            
+                                <div class="multifield">
+                                    <div class="subfield">
+                                        <label for="challform-points">Points *</label>
+                                        <input type="number" min="0" id="challform-points" name="max_points" value="{{ .MaxPoints }}" required>
+                                    </div>
+                                    <div class="subfield">
+                                        <label for="challform-category">Category *</label>
+                                        <select name="category" required>
+                                            {{ range $cats }}
+                                                <option value="{{ . }}" {{ if eq $chal.Category . }}selected{{ end }}>{{ . }}</option>
+                                            {{ end }}
+                                        </select>
+                                    </div>
+                                    <div class="subfield">
+                                        <label for="challform-difficulty">Difficulty *</label>
+                                        <select name="difficulty" required>
+                                            {{ range $diffs }}
+                                                <option value="{{ . }}" {{ if eq $chal.Difficulty . }}selected{{ end }}>{{ . }}</option>
+                                            {{ end }}
+                                        </select>
+                                    </div>
+                                </div>
+            
+                                <div>
+                                    <label for="challform-desc">Description</label>
+                                    <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!">{{ .Description }}</textarea>
+                                </div>
+            
+                                <div class="multifield">
+                                    <div class="subfield">
+                                        <label for="challform-hint1">Hint 1</label>
+                                        <input type="text" id="challform-hint1" name="hint1" {{ if .Hint1 }} value="{{ .Hint1 }}" {{ end }}>
+                                    </div>
+                                    <div class="subfield">
+                                        <label for="challform-hint2">Hint 2</label>
+                                        <input type="text"id="challform-hint2" name="hint2" {{ if .Hint2 }} value="{{ .Hint2 }}" {{ end }}>
+                                    </div>
+                                </div>
+            
+                                <div class="multifield">
+                                    <div class="subfield">
+                                        <label for="challform-host">Host</label>
+                                        <input type="text" id="challform-host" name="host" {{ if .Host }} value="{{ .Host }}" {{ end }}>
+                                    </div>
+                                    <div class="subfield">
+                                        <label for="challform-port">Port</label>
+                                        <input type="number" min="0" max="65535" id="challform-port" name="port" {{ if .Port }} value="{{ .Port }}" {{ end }}>
+                                    </div>
+                                </div>
+
+                                <div class="multifield">
+                                    <div class="subfield">
+                                        <label for="challform-files">Files (.zip)</label>
+                                        <input type="file" id="challform-files" name="files">
+                                    </div>
+                                    <div class="subfield">
+                                        <label for="challform-hidden">Hidden</label>
+                                        <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="challform-extra">Extra</label>
+                                    <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .IsExtra }} checked {{ end }}>
+                                </div>
+
+                                <input type="hidden" name="id" value="{{ .ID }}">
+                                <button type="submit" class="btn btn-primary">Update challenge</button>
+                                <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {{ end }}
+            {{ end }}
+            </div>
+        </div>
+
+        <div class="tab-pane" id="submissions" role="tabpanel" aria-labelledby="submissions-tab">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="table-default">
+                        <th scope="col">Username</th>
+                        <th scope="col">Submission</th>
+                        <th scope="col">Challenge</th>
+                        <th scope="col">Correct</th>
+                        <th scope="col">Timestamp</th>
+                    </tr>
+                </thead>
+                <tr height="15px"></tr>
+                <tbody class="my-5">
+                    {{ range .Submissions }}
+                    <tr class="table-hover" style="color:black">
+                        <td><a href="/user/{{ .UserUsername }}" style="color: black;"> {{ .UserUsername }} </a></td>
+                        <td>{{ .Flag }}</td>
+                        <td>{{ .ChalName }}</td>
+                        {{ if eq .Status "c" }}
+                            <td>&#9989;</td>
+                        {{ else if eq .Status "w" }}
+                            <td>&#10060;</td>
+                        {{ else }}
+                            <td>&#128260;</td>
+                        {{ end }}
+
+                        {{ if .Timestamp }}
+                           <td>{{ .Timestamp.Format "15:04 02-01-2006" }}</td>
+                        {{ else }}
+                            <td>???</td>
+                        {{ end }}
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <table class="table table-hover">
+                <head>
+                    <tr class="table-default">
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Score</th>
+                        <th scope="col">Admin</th>
+                        <th scope="col"></th>
+                    </tr>
+                </head>
+                <tbody class="my-5">
+                    {{ range .Users }}
+                    <tr>
+                        <td><a href="/user/{{ .Username }}" style="color: black;"> {{ .Username }} </a></td>
+                        <td>{{ .Email }}</td>
+                        <td>{{ .Score }}</td>
+                        {{ if .IsAdmin }}
+                            <td>&#9989;</td>
+                        {{ else }}
+                            <td>&#10060;</td>
+                        {{ end }}
+                        {{ if .IsAdmin }}
+                            <td></td>
+                        {{ else }}
+                        <td><button type="button" class="btn btn-outline-danger btn-sm float-right mr-3"
+                            data-toggle="modal" data-target="#resetpwModal" data-username="{{ .Username }}">Reset password</button>
+                        </td>
+                        {{ end }}
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
             <div class="mt-3 mx-3">
                 <form class="mx-auto" style="width: 95%" action="/admin/config" method="POST">
 
@@ -33,8 +311,8 @@
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
             </div>
-
         </div>
+
     </div>
 
     <!-- Modal -->

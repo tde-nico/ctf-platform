@@ -1,5 +1,7 @@
 package db
 
+import "time"
+
 type Config struct {
 	Key   string
 	Type  string
@@ -38,14 +40,26 @@ type Challenge struct {
 type Solve struct {
 	UserID    int
 	ChalID    int
-	Timestamp string
+	Timestamp time.Time
 }
 
 type Submission struct {
-	ID        int
-	UserID    int
-	ChalID    int
-	Status    rune
-	Flag      string
-	Timestamp string
+	UserUsername string
+	ChalName     string
+	Status       string
+	Flag         string
+	Timestamp    time.Time
+}
+
+var CATEGORIES = []string{
+	"Web",
+	"Crypto",
+	"Rev",
+	"Pwn",
+}
+
+var DIFFICULTIES = []string{
+	"Easy",
+	"Medium",
+	"Hard",
 }
