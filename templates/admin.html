@@ -1,338 +1,34 @@
-{% extends "base.html" %} {% block content %}
+{{define "content"}}
 
 <div class="container">
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="challenges-tab" data-toggle="tab" href="#challenges" role="tab" aria-controls="challenges" aria-selected="true">Challenges</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="submissions-tab" data-toggle="tab" href="#submissions" role="tab" aria-controls="submissions" aria-selected="false">Submissions</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Users</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="notifications-tab" data-toggle="tab" href="#notifications" role="tab" aria-controls="notifications" aria-selected="false">Notifications</a>
-        </li>
-        <li class="nav-item">
             <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuration</a>
         </li>
     </ul>
-
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane show active" id="challenges" role="tabpanel" aria-labelledby="challenges-tab">
-
-            <div class="mt-3">
-                <form class="challform mx-auto" action="/admin/newchallenge" method="POST" enctype="multipart/form-data">
-                    <h5>New challenge</h5>
-
-                    <div>
-                        <label for="challform-name">Name *</label>
-                        <input type="text" id="challform-name" name="name" required>
-                    </div>
-
-                    <div>
-                        <label for="challform-flag">Flag *</label>
-                        <input type="text" id="challform-flag" name="flag" required>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-points">Points *</label>
-                            <input type="number" min="0" id="challform-points" name="points" value="500" required>
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-category">Category *</label>
-                            <select name="category" required>
-                                <option value="" disabled selected="true">Select...</option>
-                                {% for cat in get_categories() %}
-                                    <option value="{{ cat }}">{{ cat.capitalize() }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-difficulty">Difficulty *</label>
-                            <select name="difficulty" required>
-                                <option value="" disabled selected="true">Select...</option>
-                                {% for diff in get_difficulties() %}
-                                    <option value="{{ diff }}">{{ diff.capitalize() }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="challform-desc">Description</label>
-                        <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!"></textarea>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-hint1">Hint 1</label>
-                            <input type="text" id="challform-hint1" name="hint1">
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-hint2">Hint 2</label>
-                            <input type="text"id="challform-hint2" name="hint2">
-                        </div>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-host">Host</label>
-                            <input type="text" id="challform-host" name="host">
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-port">Port</label>
-                            <input type="number" min="0" max="65535" id="challform-port" name="port">
-                        </div>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-files">Files (.zip)</label>
-                            <input type="file" id="challform-files" name="files">
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-hidden">Hidden</label>
-                            <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="challform-extra">Extra</label>
-                        <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary mx-auto">Create challenge</button>
-                </form>
-            </div>
-
-            <br />
-
-            <div id="challenges-accordion" class="mx-1 mt-1">
-            {% for category, challs in challenges %}
-            <br/>
-            <h5> {{ category }} </h5>
-            <hr style="height:2px">
-        
-                {% for chal in challs %}
-
-                <div class="card">
-                    <div class="card-header" id="heading-{{ category }}-{{ loop.index }}" data-toggle="collapse" data-target="#collapse-{{ category }}-{{ loop.index }}" aria-expanded="false" aria-controls="collapse-{{ category }}-{{ loop.index }}">
-                        {{ chal.name }} {% if chal.hidden %} <i class="fa fa-eye-slash" aria-hidden="true"></i> {% endif %} 
-                    </div>
-                    <div id="collapse-{{ category }}-{{ loop.index }}" class="collapse" aria-labelledby="heading-{{ category }}-{{ loop.index }}" data-parent="#challenges-accordion">
-                        <div class="card-body">
-                            <form class="challform mx-auto" style="width: 95%" action="/admin/updatechallenge" method="POST" enctype="multipart/form-data">
-
-                                <div>
-                                    <label for="challform-name">Name *</label>
-                                    <input type="text" id="challform-name" name="name" required value="{{ chal.name }}">
-                                </div>
-
-                                <div>
-                                    <label for="challform-flag">Flag *</label>
-                                    <input type="text" id="challform-flag" name="flag" required value="{{ chal.flag }}">
-                                </div>
-            
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-points">Points *</label>
-                                        <input type="number" min="0" id="challform-points" name="max_points" value="{{ chal.max_points }}" required>
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-category">Category *</label>
-                                        <select name="category" required>
-                                            {% for cat in get_categories() %}
-                                                <option value="{{ cat.capitalize() }}" {% if chal.category == cat %}selected{% endif %}>{{ cat.capitalize() }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-difficulty">Difficulty *</label>
-                                        <select name="difficulty" required>
-                                            {% for diff in get_difficulties() %}
-                                                <option value="{{ diff }}" {% if chal.difficulty == diff %}selected{% endif %}>{{ diff.capitalize() }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-            
-                                <div>
-                                    <label for="challform-desc">Description</label>
-                                    <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!">{{ chal.description }}</textarea>
-                                </div>
-            
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-hint1">Hint 1</label>
-                                        <input type="text" id="challform-hint1" name="hint1" {% if chal.hint1 %} value="{{ chal.hint1 }}" {% endif %}>
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-hint2">Hint 2</label>
-                                        <input type="text"id="challform-hint2" name="hint2" {% if chal.hint2 %} value="{{ chal.hint2 }}" {% endif %}>
-                                    </div>
-                                </div>
-            
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-host">Host</label>
-                                        <input type="text" id="challform-host" name="host" {% if chal.host %} value="{{ chal.host }}" {% endif %}>
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-port">Port</label>
-                                        <input type="number" min="0" max="65535" id="challform-port" name="port" {% if chal.port %} value="{{ chal.port }}" {% endif %}>
-                                    </div>
-                                </div>
-
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-files">Files (.zip)</label>
-                                        <input type="file" id="challform-files" name="files">
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-hidden">Hidden</label>
-                                        <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {% if chal.hidden %} checked {% endif %}>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="challform-extra">Extra</label>
-                                    <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {% if chal.is_extra %} checked {% endif %}>
-                                </div>
-
-                                <input type="hidden" name="id" value="{{ chal.id }}">
-                                <button type="submit" class="btn btn-primary">Update challenge</button>
-                                <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                {% endfor %}
-                {% endfor %}
-            </div>
-
-        </div>
-        <div class="tab-pane" id="users" role="tabpanel" aria-labelledby="users-tab">
-
-            <table class="table table-hover">
-                <head>
-                    <tr class="table-default">
-                        <th scope="col">Username</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Score</th>
-                        <th scope="col">Admin</th>
-                        <th scope="col"></th>
-                    </tr>
-                </head>
-                <tbody class="my-5">
-                    {% for user in users %}
-                    <tr>
-                        <td><a href="/user/{{ user.username }}" style="color: black;"> {{ user.username }} </a></td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.score }}</td>
-                        {% if user.is_admin %}
-                        <td>&#9989;</td>
-                        {% else %}
-                        <td>&#10060;</td>
-                        {% endif %}
-                        {% if user.is_admin %}
-                        <td></td>
-                        {% else %}
-                        <td><button type="button" class="btn btn-outline-danger btn-sm float-right mr-3"
-                            data-toggle="modal" data-target="#resetpwModal" data-username="{{ user.username }}">Reset password</button>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-        </div>
-        <div class="tab-pane" id="submissions" role="tabpanel" aria-labelledby="submissions-tab">
-
-            <table class="table table-hover">
-                <thead>
-                    <tr class="table-default">
-                        <th scope="col">Username</th>
-                        <th scope="col">Submission</th>
-                        <th scope="col">Challenge</th>
-                        <th scope="col">Correct</th>
-                        <th scope="col">Timestamp</th>
-                    </tr>
-                </thead>
-                <tr height="15px"></tr>
-                <tbody class="my-5">
-                    {% for sub in submissions %}
-                    <tr class="table-dark" style="color:black">
-                        <td><a href="/user/{{ sub.user.username }}" style="color: black;"> {{ sub.user.username }} </a></td>
-                        <td>{{ sub.flag }}</td>
-                        <td>{{ sub.chal.name }}</td>
-                        {% if sub.status == 'c' %}
-                        <td>&#9989;</td>
-                        {% elif sub.status == 'w' %}
-                        <td>&#10060;</td>
-                        {% else %}
-                        <td>&#128260;</td>
-                        {% endif %}
-
-                        {% if sub.timestamp %}
-                        <td>{{ sub.timestamp.strftime('%H:%M %d-%m-%Y') }}</td>
-                        {% else %}
-                        <td>???</td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-        </div>
-        <div class="tab-pane" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
-
-            <div class="mt-3 mx-3">
-                <form class="mx-auto" style="width: 95%" action="/admin/notification" method="POST">
-                    <div class="form-group">
-                        <label for="text">Notification text</label>
-                        <input class="form-control" id="text" name="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="user">Send to (leave blank to broadcast)</label>
-                        <select id="user" name="user">
-                            <option value=""></option>
-                            {% for user in users %} {% if user.is_admin %} {% else %}
-                            <option value="{{ user.username }}">{{ user.username }}</option>
-                            {% endif %} {% endfor %}
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Send notification</button>
-                </form>
-            </div>
-
-        </div>
 
         <div class="tab-pane" id="config" role="tabpanel" aria-labelledby="config-tab">
 
             <div class="mt-3 mx-3">
                 <form class="mx-auto" style="width: 95%" action="/admin/config" method="POST">
 
-                    {% for conf in config %}
+                    {{ range .Config }}
                     <div class="form-group">
-                        <label for="conf-{{ conf.name }}">{{ conf.desc }}</label>
-                        {% if conf.type == "bool" %}
-                        <input type="checkbox" id="conf-{{ conf.name }}" name="{{ conf.name }}" value="1"
-                            {% if conf['value'] == 1 %} checked {% endif %}
-                            data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary"
-                        />
-                        {% elif conf.type == "int" %}
-                        <input type="number" id="conf-{{ conf.name }}" name="{{ conf.name }}" value="{{ conf.value }}" required />
-                        {% else %}
-                        <input type="text" id="conf-{{ conf.name }}" name="{{ conf.name }}" value="{{ conf.value }}" required />
-                        {% endif %}
+                        <label for="conf-{{ .Key }}">{{ .Desc }}</label>
+                        {{ if eq .Type "bool" }}
+                            <input type="checkbox" id="conf-{{ .Key }}" name="{{ .Key }}" value="{{ .Value }}"
+                                {{ if eq .Value "1" }} checked {{ end }}
+                                data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary"
+                                onchange="this.value = this.checked ? '1' : '0';"
+                            />
+                        {{ else if eq .Type "int" }}
+                            <input type="number" id="conf-{{ .Key }}" name="{{ .Key }}" value="{{ .Value }}" required />
+                        {{ else }}
+                            <input type="text" id="conf-{{ .Key }}" name="{{ .Key }}" value="{{ .Value }}" required />
+                        {{ end }}
                     </div>
-                    {% endfor %}
+                    {{ end }}
 
                     <button type="submit" class="btn btn-primary">Save</button>
                 </form>
@@ -394,4 +90,4 @@
     });
 </script>
 
-{% endblock %}
+{{ end }}

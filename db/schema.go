@@ -1,16 +1,23 @@
 package db
 
+type Config struct {
+	Key   string
+	Type  string
+	Value string
+	Desc  string
+}
+
 type User struct {
-	Id       int
+	ID       int
 	Username string
 	Email    string
-	Apikey   string
+	ApiKey   string
 	Score    int
 	IsAdmin  bool
 }
 
 type Challenge struct {
-	Id          int
+	ID          int
 	Name        string
 	Description string
 	Difficulty  string
@@ -29,15 +36,15 @@ type Challenge struct {
 }
 
 type Solve struct {
-	UserId    int
-	ChalId    int
+	UserID    int
+	ChalID    int
 	Timestamp string
 }
 
 type Submission struct {
-	Id        int
-	UserId    int
-	ChalId    int
+	ID        int
+	UserID    int
+	ChalID    int
 	Status    rune
 	Flag      string
 	Timestamp string

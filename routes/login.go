@@ -10,20 +10,20 @@ import (
 	"github.com/gorilla/sessions"
 )
 
-func loginUser(s *sessions.Session, username, password string) (*db.User, error) {
+func loginUser(s *sessions.Session, username, password string) (string, error) {
 	username = strings.TrimSpace(username)
 	if !USERNAME_REGEX.MatchString(username) {
 		addFlash(s, "Invalid username")
-		return nil, fmt.Errorf("invalid username")
+		return "", fmt.Errorf("invalid username")
 	}
 
-	user, err := db.LoginUser(username, password)
+	apiKey, err := db.LoginUser(username, password)
 	if err != nil {
 		addFlash(s, "Invalid username or password")
-		return nil, err
+		return "", err
 	}
 
-	return user, nil
+	return apiKey, nil
 }
 
 func login_get(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
@@ -49,7 +49,7 @@ func login_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	user, err := loginUser(s, username, password)
+	apiKey, err := loginUser(s, username, password)
 	if err != nil {
 		log.Errorf("Error logging in: %v", err)
 		if saveSession(w, r, s) {
@@ -58,7 +58,7 @@ func login_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	s.Values["user"] = user
+	s.Values["apikey"] = apiKey
 
 	if saveSession(w, r, s) {
 		http.Redirect(w, r, "/challenges", http.StatusSeeOther)

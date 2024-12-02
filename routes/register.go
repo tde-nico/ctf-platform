@@ -42,7 +42,9 @@ func isRegistrationAllowed(w http.ResponseWriter, r *http.Request, s *sessions.S
 	allowed := db.GetConfig("registration-allowed")
 	if allowed == nil || *allowed == 0 {
 		addFlash(s, "Registration is disabled")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		if saveSession(w, r, s) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		}
 		return false
 	}
 	return true

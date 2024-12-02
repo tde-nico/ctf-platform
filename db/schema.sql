@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS "config" (
 	"key" TEXT NOT NULL,
-	"value" INTEGER,
+	"type" TEXT NOT NULL DEFAULT 'text',
+	"value" TEXT NOT NULL DEFAULT '',
+	"desc" TEXT,
 	PRIMARY KEY("key")
 );
 

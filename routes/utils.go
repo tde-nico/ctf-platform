@@ -51,10 +51,14 @@ func saveSession(w http.ResponseWriter, r *http.Request, s *sessions.Session) bo
 }
 
 func getSessionUser(s *sessions.Session) *db.User {
-	val := s.Values["user"]
-	var user = &db.User{}
-	user, ok := val.(*db.User)
+	val := s.Values["apikey"]
+	apiKey, ok := val.(string)
 	if !ok {
+		return nil
+	}
+	user, err := db.GetUserByAPIKey(apiKey)
+	if err != nil {
+		log.Errorf("Error getting user by apikey: %v", err)
 		return nil
 	}
 	return user
