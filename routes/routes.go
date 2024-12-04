@@ -80,11 +80,11 @@ func StartRouting() {
 
 	authHandleFunc("GET /logout", logout)
 
-	authHandleFunc("GET /challenges", home)          // TODO
-	authHandleFunc("GET /user/{username}", userInfo) // TODO
-	authHandleFunc("POST /submit", home)             // TODO
-	authHandleFunc("GET /scores", home)              // TODO
-	authHandleFunc("POST /graph_data", home)         // TODO
+	authHandleFunc("GET /user/{username}", userInfo)
+	authHandleFunc("GET /challenges", challenges)
+	authHandleFunc("POST /submit", submit)        // TODO
+	authHandleFunc("GET /scores", scores)         // TODO
+	authHandleFunc("POST /graph_data", graphData) // TODO
 	// authHandleFunc("GET /newpw", home)
 	// authHandleFunc("POST /newpw", home)
 

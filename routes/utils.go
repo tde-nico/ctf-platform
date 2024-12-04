@@ -28,12 +28,20 @@ type Data struct {
 	Flashes []Flash
 }
 
+type DataInterface interface {
+	UpdateFlashes([]Flash)
+}
+
 const MAX_PASSWORD_LENGTH = 6
 const CHALLENGE_FILES_DIR = "./files"
 
 // ! TODO: change
 var store = sessions.NewCookieStore([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
 var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
+
+func (d *Data) UpdateFlashes(flashes []Flash) {
+	d.Flashes = flashes
+}
 
 func getSession(w http.ResponseWriter, r *http.Request) (*sessions.Session, bool) {
 	session, err := store.Get(r, "session")
@@ -95,9 +103,24 @@ func getFlashes(w http.ResponseWriter, r *http.Request, s *sessions.Session) []F
 	return flashes
 }
 
+func is_visible_category(chals []*db.Challenge) bool {
+	for _, chal := range chals {
+		if !chal.Hidden {
+			return true
+		}
+	}
+	return false
+}
+
 func getTemplate(w http.ResponseWriter, page string) (*template.Template, error) {
 	// TODO: parse all templates at startup
-	tmpl, err := template.New("").ParseFiles("templates/base.html", fmt.Sprintf("templates/%s.html", page))
+	funcMap := template.FuncMap{
+		"is_visible_category": is_visible_category,
+		"split":               func(sep string, s string) []string { return strings.Split(s, sep) },
+		"last":                func(s []string) string { return s[len(s)-1] },
+	}
+
+	tmpl, err := template.New("").Funcs(funcMap).ParseFiles("templates/base.html", fmt.Sprintf("templates/%s.html", page))
 	if err != nil {
 		log.Errorf("Error parsing template %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -106,8 +129,8 @@ func getTemplate(w http.ResponseWriter, page string) (*template.Template, error)
 	return tmpl, nil
 }
 
-func executeTemplate(w http.ResponseWriter, r *http.Request, s *sessions.Session, tmpl *template.Template, data *Data) {
-	data.Flashes = getFlashes(w, r, s)
+func executeTemplate(w http.ResponseWriter, r *http.Request, s *sessions.Session, tmpl *template.Template, data DataInterface) {
+	data.UpdateFlashes(getFlashes(w, r, s))
 
 	err := tmpl.ExecuteTemplate(w, "base", data)
 	if err != nil {
@@ -116,14 +139,13 @@ func executeTemplate(w http.ResponseWriter, r *http.Request, s *sessions.Session
 	}
 }
 
-func unzipFile(fileDir string, file *zip.File) error {
+func unzipFile(tmpFileDir string, file *zip.File) error {
 	tmpFile, err := file.Open()
 	if err != nil {
 		return err
 	}
 	defer tmpFile.Close()
 
-	tmpFileDir := fmt.Sprintf("%s/%s", fileDir, file.Name)
 	f, err := os.OpenFile(tmpFileDir, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return err
@@ -162,7 +184,9 @@ func unzip(chalName string, file multipart.File, header *multipart.FileHeader) (
 
 	files := ""
 	for i, file := range zreader.File {
-		err := unzipFile(fileDir, file)
+		tmpFileDir := fmt.Sprintf("%s/%s", fileDir, file.Name)
+
+		err := unzipFile(tmpFileDir, file)
 		if err != nil {
 			return "", err
 		}
@@ -170,7 +194,7 @@ func unzip(chalName string, file multipart.File, header *multipart.FileHeader) (
 		if i > 0 {
 			files += ","
 		}
-		files += file.Name
+		files += tmpFileDir
 	}
 
 	return files, nil

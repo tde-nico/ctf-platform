@@ -46,11 +46,5 @@ func userInfo(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	log.Infof("User: %+v", tmpl)
-
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		log.Errorf("Error executing template: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	executeTemplate(w, r, s, tmpl, data)
 }

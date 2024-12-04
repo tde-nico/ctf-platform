@@ -4,14 +4,17 @@
     <h2>Challenges</h2>
 </div>
 
-{{ range $cat, $chals := .Challenges }} {{ if is_visible_category(challs) or user.is_admin }}
+{{ $user := .User }}
+{{ $solves := .Solves }}
+
+{{ range $cat, $chals := .Challenges }} {{ if or ($chals | is_visible_category) $user.IsAdmin }}
     <h3 class="ml-5 mt-5"> {{ $cat }} </h3>
     <div class="row mx-auto mb-5" style="width:95%">
-        {{ range _, $chal :=  $chals }}
-            {{ if or (not $chal.Hidden) .User.IsAdmin }}
+        {{ range $i, $chal :=  $chals }}
+            {{ if or (not $chal.Hidden) $user.IsAdmin }}
             <div class="col-md-3 py-5">
-                {{ if $chal.ID not in .Solves }}
-                    <button class="btn {{ if $chal.Hidden }} btn-secondary {{ else }} btn-dark {{ end }} w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" {{ if chal.is_extra }} style="background-color: #D6AD78" {{ end }}>
+                {{ if not (index $solves $chal.Name) }}
+                    <button class="btn {{ if $chal.Hidden }} btn-secondary {{ else }} btn-dark {{ end }} w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ end }}>
                 {{ else }}
                     <button class="btn w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" style="background-color: palegreen">
                 {{ end }}
@@ -28,8 +31,8 @@
 {{ end }} {{ end }}
 
 {{ range $cat, $chals := .Challenges }}
-    {{ range _, $chal := $chals }}
-        {{ if or (not $chal.Hidden) .User.IsAdmin }}
+    {{ range $chal := $chals }}
+        {{ if or (not $chal.Hidden) $user.IsAdmin }}
 <div class="d-none {{ $chal.ID }} challtoggle position-fixed" style="width: 35%; top:50%; left:50%; transform: translate(-50%, -50%); border: 0px solid black; background-color: GhostWhite; border-radius:10px; color: DimGrey; box-shadow: 0px 0px 10px #888888;">
     <div class="text-center">
         <h1 class="mt-4"> {{ $chal.Name }} </h1>
@@ -37,35 +40,34 @@
         <h4> Points: {{ $chal.Points }} </h4>
 
         <div class="mt-5 mb-3 ml-3 mr-3" style="text-decoration: none;">
-        {{ set rows = chal.description.split('\n') }}
-        {{ for row in rows }}
-            <h6 class="mb-0">{{ row | safe }}</h6>
+        {{ $rows := split "\n" $chal.Description }}
+        {{ range $index, $row := $rows }}
+            <h6 class="mb-0">{{ $row }}</h6>
         {{ end }}
         </div>
 
         {{ if $chal.Files }}
             </br>
-            {{ set files = chal.files.split(',') }}
-            {{ for file in files }}
+            {{ $files := split "," $chal.Files }}
+            {{ range $file := $files }}
                 <h6>
-                    <a href="{{ file }}" style="color: grey; text-decoration: none;">
-                        <i class="fa fa-download download_icon" aria-hidden="true"></i> {{ file.split("/")[-1] }} </a>
+                    <a href="{{ $file }}" style="color: grey; text-decoration: none;">
+                        <i class="fa fa-download download_icon" aria-hidden="true"></i> {{ $file | split "/" | last }} </a>
                 </h6>
             {{ end }}
         {{ end }}
-        {{ if $chal.Host and chal.Port }}
-            <h6 class="my-3"> nc {{ chal.Host }} {{ chal.Port }} </h6>
-        {{ end }}
-        {{ if $chal.Host }}
-            <h6 class="my-3">{{ chal.Host }}</h6>
+        {{ if and $chal.Host $chal.Port }}
+            <h6 class="my-3"> nc {{ $chal.Host }} {{ $chal.Port }} </h6>
+        {{ else if $chal.Host }}
+            <a href="{{ $chal.Host }}"><h6 class="my-3">{{ $chal.Host }}</h6></a>
         {{ end }}
         {{ if $chal.Hint1 }}
-            <p class="mt-5 mb-3">&bull; {{ chal.Hint1 | safe }} </p>
+            <p class="mt-5 mb-3">&bull; {{ $chal.Hint1 }} </p>
         {{ end }}
-        {{ if chal.Hint2 }}
-            <p class="my-3">&bull; {{ chal.hint2 | safe }} </p>
+        {{ if $chal.Hint2 }}
+            <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
         {{ end }}
-        {{ if (user.id, chal.id) not in solves }}
+        {{ if not (index $solves $chal.Name) }}
             <form class="mb-4" action="/submit" method="POST">
                 <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
                     <input type="hidden" name="challID" value="{{ $chal.ID }}">

@@ -258,6 +258,8 @@ func UpdateChallenge(chal *Challenge) error {
 		return fmt.Errorf("database not initialized")
 	}
 
+	// TODO: Recompute points if max points changed
+
 	_, err := db.Exec("UPDATE challenges SET name = ?, description = ?, difficulty = ?, max_points = ?, host = ?, port = ?, category = ?, files = ?, flag = ?, hint1 = ?, hint2 = ?, hidden = ?, is_extra = ? WHERE id = ?",
 		chal.Name,
 		chal.Description,

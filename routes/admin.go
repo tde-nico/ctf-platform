@@ -59,13 +59,7 @@ func admin(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	data.Flashes = getFlashes(w, r, s)
-
-	err = tmpl.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		log.Errorf("Error executing template %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
+	executeTemplate(w, r, s, tmpl, data)
 }
 
 func adminNewChall(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
@@ -176,10 +170,6 @@ func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 	}
 }
-
-// func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-// 	log.Infof("adminDeleteChall")
-// }
 
 func adminResetPw(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	log.Infof("adminResetPw")

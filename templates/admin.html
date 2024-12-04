@@ -120,7 +120,7 @@
                 {{ range $i, $chal := $chals }}
 
                 <div class="card">
-                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-toggle="collapse" data-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}">
+                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-toggle="collapse" data-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ else if $chal.Hidden }} style="background-color: #cbcbcb" {{ end }}>
                         {{ .Name }} {{ if .Hidden }} <i class="fa fa-eye-slash" aria-hidden="true"></i> {{ end }} 
                     </div>
                     <div id="collapse-{{ .Category }}-{{ $i }}" class="collapse" aria-labelledby="heading-{{ .Category }}-{{ $i }}" data-parent="#challenges-accordion">
