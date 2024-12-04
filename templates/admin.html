@@ -61,7 +61,7 @@
 
                     <div>
                         <label for="challform-desc">Description</label>
-                        <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!"></textarea>
+                        <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is accepted!"></textarea>
                     </div>
 
                     <div class="multifield">
@@ -93,7 +93,7 @@
                         </div>
                         <div class="subfield">
                             <label for="challform-hidden">Hidden</label>
-                            <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
+                            <input type="checkbox" id="challform-hidden" name="is_hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
                         </div>
                     </div>
 
@@ -140,7 +140,7 @@
                                 <div class="multifield">
                                     <div class="subfield">
                                         <label for="challform-points">Points *</label>
-                                        <input type="number" min="0" id="challform-points" name="max_points" value="{{ .MaxPoints }}" required>
+                                        <input type="number" min="0" id="challform-points" name="points" value="{{ .MaxPoints }}" required>
                                     </div>
                                     <div class="subfield">
                                         <label for="challform-category">Category *</label>
@@ -194,7 +194,7 @@
                                     </div>
                                     <div class="subfield">
                                         <label for="challform-hidden">Hidden</label>
-                                        <input type="checkbox" id="challform-hidden" name="hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
+                                        <input type="checkbox" id="challform-hidden" name="is_hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
                                     </div>
                                 </div>
 
@@ -205,7 +205,8 @@
 
                                 <input type="hidden" name="id" value="{{ .ID }}">
                                 <button type="submit" class="btn btn-primary">Update challenge</button>
-                                <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletechalModal" data-name="{{ .Name }}">Delete challenge</button>
+                                <!-- <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button> -->
                             </form>
                         </div>
                     </div>
@@ -219,9 +220,9 @@
             <table class="table table-hover" style="table-layout: fixed; width: 100%;">
                 <thead>
                     <tr class="table-default">
-                        <th scope="col" style="width: 10%">Username</th>
+                        <th scope="col" style="width: 15%">Username</th>
                         <th scope="col">Submission</th>
-                        <th scope="col">Challenge</th>
+                        <th scope="col" style="width: 25%">Challenge</th>
                         <th scope="col" style="width: 10%">Correct</th>
                         <th scope="col" style="width: 15%">Timestamp</th>
                     </tr>
@@ -316,6 +317,30 @@
     </div>
 
     <!-- Modal -->
+
+    <div class="modal fade" id="deletechalModal" tabindex="-1" role="dialog" aria-labelledby="deletechalModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletechalModalLabel">Delete Challenge</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Do you really want to Delete the Challenge <b class="name"></b>? <br/>
+                </div>
+                <div class="modal-footer">
+                    <form action="/admin/deletechal" method="POST">
+                        <input type="hidden" name="name" value="" class="name">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" method="POST" class="btn btn-danger">Delete Challenge</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="modal fade" id="resetpwModal" tabindex="-1" role="dialog" aria-labelledby="resetpwModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -343,6 +368,20 @@
 </div>
 
 <script type="text/javascript">
+    $('#deletechalModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var name = button.data('name'); // Extract info from data-* attributes
+        var modal = $(this);
+        modal.find(".name").text(name);
+        modal.find(".name").attr("value", name);
+    });
+
+    $('#deletechalModal').on('hidden.bs.modal', function (event) {
+        var modal = $(this);
+        modal.find(".name").text("");
+        modal.find(".name").attr("value", "")
+    });
+
     $('#resetpwModal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var username = button.data('username'); // Extract info from data-* attributes

@@ -1,85 +1,88 @@
-{% extends "base.html" %} {% block content %}
+{{define "content"}}
 
 <div class="my-5 text-center">
     <h2>Challenges</h2>
 </div>
 
-{% for category, challs in challenges %} {% if is_visible_category(challs) or user.is_admin %}
-    <h3 class="ml-5 mt-5"> {{ category.capitalize() }} </h3>
+{{ range $cat, $chals := .Challenges }} {{ if is_visible_category(challs) or user.is_admin }}
+    <h3 class="ml-5 mt-5"> {{ $cat }} </h3>
     <div class="row mx-auto mb-5" style="width:95%">
-        {% for chal in challs %}
-        {% if not chal.hidden or user.is_admin %}
-        <div class="col-md-3 py-5">
-            {% if (user.id, chal.id) not in solves %}
-                <button class="btn {% if chal.hidden %} btn-secondary {% else %} btn-dark {% endif %} w-100 h-100 chalpreview my-2" name="{{ chal.id }}" {% if chal.is_extra %} style="background-color: #D6AD78" {% endif %}>
-            {% else %}
-                <button class="btn w-100 h-100 chalpreview my-2" name="{{ chal.id }}" style="background-color: palegreen">
-            {% endif %}
-                    {% if chal.is_extra %}
-                        <div class="animated-rainbow">EXTRA</div>
-                    {% endif %}
-                    <h4> {{ chal.name }} {% if chal.hidden %}<i class="fa fa-eye-slash" aria-hidden="true"></i>{% endif %} </h4>
-                    <h5> {{ chal.points }} ({{ chal.difficulty }})</h5>
-                </button>
-        </div>
-        {% endif %}
-        {% endfor %}
+        {{ range _, $chal :=  $chals }}
+            {{ if or (not $chal.Hidden) .User.IsAdmin }}
+            <div class="col-md-3 py-5">
+                {{ if $chal.ID not in .Solves }}
+                    <button class="btn {{ if $chal.Hidden }} btn-secondary {{ else }} btn-dark {{ end }} w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" {{ if chal.is_extra }} style="background-color: #D6AD78" {{ end }}>
+                {{ else }}
+                    <button class="btn w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" style="background-color: palegreen">
+                {{ end }}
+                        {{ if $chal.IsExtra }}
+                            <div class="animated-rainbow">EXTRA</div>
+                        {{ end }}
+                        <h4> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
+                        <h5> {{ $chal.Points }} ({{ $chal.Difficulty }})</h5>
+                    </button>
+            </div>
+            {{ end }}
+        {{ end }}
     </div>
-{% endif %} {% endfor %}
+{{ end }} {{ end }}
 
-{% for category, challs in challenges %}
-    {% for chal in challs %}
-        {% if not chal.hidden or user.is_admin %}
-<div class="d-none {{ chal.id }} challtoggle position-fixed" style="width: 35%; top:50%; left:50%; transform: translate(-50%, -50%); border: 0px solid black; background-color: GhostWhite; border-radius:10px; color: DimGrey; box-shadow: 0px 0px 10px #888888;">
+{{ range $cat, $chals := .Challenges }}
+    {{ range _, $chal := $chals }}
+        {{ if or (not $chal.Hidden) .User.IsAdmin }}
+<div class="d-none {{ $chal.ID }} challtoggle position-fixed" style="width: 35%; top:50%; left:50%; transform: translate(-50%, -50%); border: 0px solid black; background-color: GhostWhite; border-radius:10px; color: DimGrey; box-shadow: 0px 0px 10px #888888;">
     <div class="text-center">
-        <h1 class="mt-4"> {{ chal.name }} </h1>
-        <h3> Solves: {{ chal.solves }} </h3>
-        <h4> Points: {{ chal.points }} </h4>
+        <h1 class="mt-4"> {{ $chal.Name }} </h1>
+        <h3> Solves: {{ $chal.Solves }} </h3>
+        <h4> Points: {{ $chal.Points }} </h4>
 
         <div class="mt-5 mb-3 ml-3 mr-3" style="text-decoration: none;">
-        {% set rows = chal.description.split('\n') %}
-        {% for row in rows %}
+        {{ set rows = chal.description.split('\n') }}
+        {{ for row in rows }}
             <h6 class="mb-0">{{ row | safe }}</h6>
-        {% endfor %}
+        {{ end }}
         </div>
 
-        {% if chal.files %}
+        {{ if $chal.Files }}
             </br>
-            {% set files = chal.files.split(',') %}
-            {% for file in files %}
+            {{ set files = chal.files.split(',') }}
+            {{ for file in files }}
                 <h6>
                     <a href="{{ file }}" style="color: grey; text-decoration: none;">
                         <i class="fa fa-download download_icon" aria-hidden="true"></i> {{ file.split("/")[-1] }} </a>
                 </h6>
-            {% endfor %}
-        {% endif %}
-        {% if chal.host and chal.port %}
-            <h6 class="my-3"> nc {{ chal.host }} {{ chal.port }} </h6>
-        {% endif %}
-        {% if chal.hint1 %}
-            <p class="mt-5 mb-3">&bull; {{ chal.hint1 | safe }} </p>
-        {% endif %}
-        {% if chal.hint2 %}
+            {{ end }}
+        {{ end }}
+        {{ if $chal.Host and chal.Port }}
+            <h6 class="my-3"> nc {{ chal.Host }} {{ chal.Port }} </h6>
+        {{ end }}
+        {{ if $chal.Host }}
+            <h6 class="my-3">{{ chal.Host }}</h6>
+        {{ end }}
+        {{ if $chal.Hint1 }}
+            <p class="mt-5 mb-3">&bull; {{ chal.Hint1 | safe }} </p>
+        {{ end }}
+        {{ if chal.Hint2 }}
             <p class="my-3">&bull; {{ chal.hint2 | safe }} </p>
-        {% endif %}
-        {% if (user.id, chal.id) not in solves %}
+        {{ end }}
+        {{ if (user.id, chal.id) not in solves }}
             <form class="mb-4" action="/submit" method="POST">
                 <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
-                    <input type="hidden" name="challID" value="{{ chal.id }}">
+                    <input type="hidden" name="challID" value="{{ $chal.ID }}">
                     <input type="text" class="form-control challenge-flag" placeholder="flag" name="flag">
                     <div class="input-group-append">
                         <button class="btn" type="submit" method="POST" style="background-color: silver">Submit</button>
                     </div>
                 </div>
             </form>
-        {% else %}
+        {{ else }}
             <h6 class="my-4"> Challenge already solved</h6>
-        {% endif %}
+        {{ end }}
         </div>
 </div>
-        {% endif %}
-    {% endfor %}
-{% endfor %}
+        {{ end }}
+    {{ end }}
+{{ end }}
 
 <script>
     $(".chalpreview").click(function(e) {
@@ -101,4 +104,4 @@
     });
 </script>
 
-{% endblock %}
+{{ end }}

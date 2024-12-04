@@ -80,24 +80,20 @@ func StartRouting() {
 
 	authHandleFunc("GET /logout", logout)
 
-	// TODO
-	// TODO
-	authHandleFunc("GET /challenges", home)
-	authHandleFunc("GET /user/{username}", home)
-	authHandleFunc("POST /submit", home)
-	authHandleFunc("GET /scores", home)
-	authHandleFunc("POST /graph_data", home)
+	authHandleFunc("GET /challenges", home)      // TODO
+	authHandleFunc("GET /user/{username}", home) // TODO
+	authHandleFunc("POST /submit", home)         // TODO
+	authHandleFunc("GET /scores", home)          // TODO
+	authHandleFunc("POST /graph_data", home)     // TODO
 	// authHandleFunc("GET /newpw", home)
 	// authHandleFunc("POST /newpw", home)
 
 	adminHandleFunc("GET /admin", admin)
 	adminHandleFunc("POST /admin/newchal", adminNewChall)
 	adminHandleFunc("POST /admin/updatechal", adminUpdateChall)
-	// adminHandleFunc("POST /admin/deletechal", adminDeleteChall)
-	adminHandleFunc("POST /admin/resetpw", adminResetPw)
+	adminHandleFunc("POST /admin/deletechal", adminDeleteChall)
+	adminHandleFunc("POST /admin/resetpw", adminResetPw) // TODO
 	adminHandleFunc("POST /admin/config", adminConfig)
-	// TODO
-	// TODO
 
 	log.Notice("Serving on :8888")
 	if err := http.ListenAndServe(":8888", nil); err != nil {

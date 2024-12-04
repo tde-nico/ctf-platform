@@ -92,7 +92,7 @@ func GetChallenges() (map[string][]*Challenge, error) {
 		return nil, fmt.Errorf("database not initialized")
 	}
 
-	rows, err := db.Query("SELECT * FROM challenges")
+	rows, err := db.Query("SELECT * FROM challenges ORDER BY points")
 	if err != nil {
 		return nil, err
 	}
@@ -160,4 +160,95 @@ func GetSubmissions() ([]*Submission, error) {
 		submissions = append(submissions, &sub)
 	}
 	return submissions, nil
+}
+
+func CheckChallengeExists(name string) error {
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT id FROM challenges WHERE name = ?", name)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return fmt.Errorf("challenge already exists")
+	}
+	return nil
+}
+
+func CheckFlagExists(flag string) error {
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT id FROM challenges WHERE flag = ?", flag)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		return fmt.Errorf("flag already exists")
+	}
+	return nil
+}
+
+func CreateChallenge(chal *Challenge) error {
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	_, err := db.Exec("INSERT INTO challenges (name, description, difficulty, points, max_points, solves, host, port, category, files, flag, hint1, hint2, hidden, is_extra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		chal.Name,
+		chal.Description,
+		chal.Difficulty,
+		chal.Points,
+		chal.MaxPoints,
+		chal.Solves,
+		chal.Host,
+		chal.Port,
+		chal.Category,
+		chal.Files,
+		chal.Flag,
+		chal.Hint1,
+		chal.Hint2,
+		chal.Hidden,
+		chal.IsExtra,
+	)
+	return err
+}
+
+func DeleteChallenge(name string) error {
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	_, err := db.Exec("DELETE FROM challenges WHERE name = ?", name)
+	return err
+}
+
+func UpdateChallenge(chal *Challenge) error {
+	if db == nil {
+		return fmt.Errorf("database not initialized")
+	}
+
+	_, err := db.Exec("UPDATE challenges SET description = ?, difficulty = ?, max_points = ?, host = ?, port = ?, category = ?, files = ?, flag = ?, hint1 = ?, hint2 = ?, hidden = ?, is_extra = ? WHERE name = ?",
+		chal.Description,
+		chal.Difficulty,
+		chal.MaxPoints,
+		chal.Host,
+		chal.Port,
+		chal.Category,
+		chal.Files,
+		chal.Flag,
+		chal.Hint1,
+		chal.Hint2,
+		chal.Hidden,
+		chal.IsExtra,
+		chal.Name,
+	)
+	return err
 }
