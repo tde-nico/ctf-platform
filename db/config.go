@@ -69,7 +69,7 @@ func GetUsers() ([]*User, error) {
 		return nil, fmt.Errorf("database not initialized")
 	}
 
-	rows, err := db.Query("SELECT username, email, score, is_admin FROM users")
+	rows, err := db.Query("SELECT username, email, score, is_admin FROM users ORDER BY username")
 	if err != nil {
 		return nil, err
 	}

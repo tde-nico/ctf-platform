@@ -216,22 +216,22 @@
         </div>
 
         <div class="tab-pane" id="submissions" role="tabpanel" aria-labelledby="submissions-tab">
-            <table class="table table-hover">
+            <table class="table table-hover" style="table-layout: fixed; width: 100%;">
                 <thead>
                     <tr class="table-default">
-                        <th scope="col">Username</th>
+                        <th scope="col" style="width: 10%">Username</th>
                         <th scope="col">Submission</th>
                         <th scope="col">Challenge</th>
-                        <th scope="col">Correct</th>
-                        <th scope="col">Timestamp</th>
+                        <th scope="col" style="width: 10%">Correct</th>
+                        <th scope="col" style="width: 15%">Timestamp</th>
                     </tr>
                 </thead>
                 <tr height="15px"></tr>
                 <tbody class="my-5">
                     {{ range .Submissions }}
                     <tr class="table-hover" style="color:black">
-                        <td><a href="/user/{{ .UserUsername }}" style="color: black;"> {{ .UserUsername }} </a></td>
-                        <td>{{ .Flag }}</td>
+                        <td style="word-wrap: break-word;"><a href="/user/{{ .UserUsername }}" style="color: black;"> {{ .UserUsername }} </a></td>
+                        <td style="word-wrap: break-word;">{{ .Flag }}</td>
                         <td>{{ .ChalName }}</td>
                         {{ if eq .Status "c" }}
                             <td>&#9989;</td>
