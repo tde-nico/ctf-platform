@@ -221,6 +221,29 @@ func CreateChallenge(chal *Challenge) error {
 	return err
 }
 
+func GetChallengeName(id int) (string, error) {
+	if db == nil {
+		return "", fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT name FROM challenges WHERE id = ?", id)
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return "", fmt.Errorf("challenge not found")
+	}
+
+	var name string
+	err = rows.Scan(&name)
+	if err != nil {
+		return "", err
+	}
+	return name, nil
+}
+
 func DeleteChallenge(name string) error {
 	if db == nil {
 		return fmt.Errorf("database not initialized")
@@ -235,7 +258,8 @@ func UpdateChallenge(chal *Challenge) error {
 		return fmt.Errorf("database not initialized")
 	}
 
-	_, err := db.Exec("UPDATE challenges SET description = ?, difficulty = ?, max_points = ?, host = ?, port = ?, category = ?, files = ?, flag = ?, hint1 = ?, hint2 = ?, hidden = ?, is_extra = ? WHERE name = ?",
+	_, err := db.Exec("UPDATE challenges SET name = ?, description = ?, difficulty = ?, max_points = ?, host = ?, port = ?, category = ?, files = ?, flag = ?, hint1 = ?, hint2 = ?, hidden = ?, is_extra = ? WHERE id = ?",
+		chal.Name,
 		chal.Description,
 		chal.Difficulty,
 		chal.MaxPoints,
@@ -248,7 +272,7 @@ func UpdateChallenge(chal *Challenge) error {
 		chal.Hint2,
 		chal.Hidden,
 		chal.IsExtra,
-		chal.Name,
+		chal.ID,
 	)
 	return err
 }

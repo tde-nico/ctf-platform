@@ -24,18 +24,16 @@ type Flash struct {
 }
 
 type Data struct {
-	User        *db.User
-	UserProfile *db.User
-	Solves      []db.Solve
-	Flashes     []Flash
+	User    *db.User
+	Flashes []Flash
 }
 
 const MAX_PASSWORD_LENGTH = 6
-
-var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
+const CHALLENGE_FILES_DIR = "./files"
 
 // ! TODO: change
 var store = sessions.NewCookieStore([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
+var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
 
 func getSession(w http.ResponseWriter, r *http.Request) (*sessions.Session, bool) {
 	session, err := store.Get(r, "session")
@@ -179,6 +177,7 @@ func unzip(chalName string, file multipart.File, header *multipart.FileHeader) (
 }
 
 func getChallFromForm(w http.ResponseWriter, r *http.Request) (*db.Challenge, error) {
+	id := r.FormValue("id")
 	name := r.FormValue("name")
 	flag := r.FormValue("flag")
 	maxPoints := r.FormValue("points")
@@ -191,6 +190,13 @@ func getChallFromForm(w http.ResponseWriter, r *http.Request) (*db.Challenge, er
 	port := r.FormValue("port")
 	isHidden := r.FormValue("is_hidden")
 	isExtra := r.FormValue("is_extra")
+
+	ID, err := strconv.Atoi(id)
+	if err != nil {
+		log.Errorf("Error converting ID to int: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return nil, err
+	}
 
 	points, err := strconv.Atoi(maxPoints)
 	if err != nil {
@@ -208,6 +214,7 @@ func getChallFromForm(w http.ResponseWriter, r *http.Request) (*db.Challenge, er
 	}
 
 	chal := &db.Challenge{
+		ID:          ID,
 		Name:        name,
 		Description: description,
 		Difficulty:  difficulty,
@@ -285,6 +292,42 @@ func createChallenge(w http.ResponseWriter, r *http.Request, s *sessions.Session
 	if saveSession(w, r, s) {
 		http.Redirect(w, r, "/admin", http.StatusSeeOther)
 	}
+}
+
+func renameChallenge(chal *db.Challenge) error {
+	oldName, err := db.GetChallengeName(chal.ID)
+	if err != nil {
+		return err
+	}
+
+	if oldName == chal.Name {
+		return nil
+	}
+
+	if db.CheckChallengeExists(chal.Name) != nil {
+		return fmt.Errorf("can't rename, challenge already exists")
+	}
+
+	hash := sha256.New()
+	_, err = hash.Write([]byte(chal.Name))
+	if err != nil {
+		return err
+	}
+	newDir := fmt.Sprintf("%s/%x/", CHALLENGE_FILES_DIR, hash.Sum(nil))
+
+	hash = sha256.New()
+	_, err = hash.Write([]byte(oldName))
+	if err != nil {
+		return err
+	}
+	oldDir := fmt.Sprintf("%s/%x/", CHALLENGE_FILES_DIR, hash.Sum(nil))
+
+	err = os.Rename(oldDir, newDir)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func extractChallengeFiles(w http.ResponseWriter, r *http.Request, s *sessions.Session, chal *db.Challenge) error {

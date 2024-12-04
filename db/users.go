@@ -144,3 +144,56 @@ func GetUserByAPIKey(apiKey string) (*User, error) {
 
 	return &user, nil
 }
+
+func GetUserByUsername(username string) (*User, error) {
+	if db == nil {
+		return nil, fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT id, email, score, is_admin FROM users WHERE username = ?", username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	user := User{Username: username}
+	err = rows.Scan(
+		&user.ID,
+		&user.Email,
+		&user.Score,
+		&user.IsAdmin,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func GetSolvesByUser(user *User) ([]*Solve, error) {
+	if db == nil {
+		return nil, fmt.Errorf("database not initialized")
+	}
+
+	rows, err := db.Query("SELECT c.name, s.timestamp FROM solves AS s, challenges AS c WHERE s.chalid = c.id AND s.userid = ?", user.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	solves := make([]*Solve, 0)
+	for rows.Next() {
+		var solve Solve
+		err = rows.Scan(&solve.ChalName, &solve.Timestamp)
+		if err != nil {
+			return nil, err
+		}
+		solves = append(solves, &solve)
+	}
+
+	return solves, nil
+}

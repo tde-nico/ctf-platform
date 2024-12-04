@@ -18,8 +18,6 @@ type AdminPanelData struct {
 	Config       []*db.Config
 }
 
-const CHALLENGE_FILES_DIR = "./files"
-
 func admin(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	tmpl, err := getTemplate(w, "admin")
 	if err != nil {
@@ -109,6 +107,16 @@ func adminUpdateChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 	err = isChallengeValid(chal)
 	if err != nil {
 		addFlash(s, err.Error())
+		if saveSession(w, r, s) {
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		}
+		return
+	}
+
+	err = renameChallenge(chal)
+	if err != nil {
+		log.Errorf("Error renaming challenge: %v", err)
+		addFlash(s, "Error renaming challenge")
 		if saveSession(w, r, s) {
 			http.Redirect(w, r, "/admin", http.StatusSeeOther)
 		}

@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 CREATE TABLE IF NOT EXISTS "solves" (
 	"userid" INTEGER NOT NULL,
 	"chalid" INTEGER NOT NULL,
-	timestamp DATETIME,
+	"timestamp" DATETIME,
 	PRIMARY KEY ("userid", "chalid"),
 	FOREIGN KEY("userid") REFERENCES "users"("id"),
 	FOREIGN KEY("chalid") REFERENCES "challenges"("id")

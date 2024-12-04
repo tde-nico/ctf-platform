@@ -4,7 +4,7 @@
   <br>
   <p>Username: {{ .UserProfile.Username }}</p>
 
-  {{ if or (eq .User.Id .UserProfile.Id) .User.IsAdmin }}
+  {{ if or (eq .User.ID .UserProfile.ID) .User.IsAdmin }}
     <p>Email: {{ .UserProfile.Email }}</p>
   {{ end }}
 
@@ -20,7 +20,7 @@
         </thead>
       {{ range .Solves }}
         <tr>
-          <td>{{ .Chal.Name }}</td>
+          <td>{{ .ChalName }}</td>
             <td>{{ .Timestamp.Format "15:04 02-01-2006" }}</td>
         </tr>
       {{ end }}

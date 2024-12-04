@@ -39,7 +39,7 @@ type Challenge struct {
 
 type Solve struct {
 	UserID    int
-	ChalID    int
+	ChalName  string
 	Timestamp time.Time
 }
 
