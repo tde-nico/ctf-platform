@@ -10,6 +10,12 @@ import (
 const APIKEY_LENGTH = 32
 const SALT_LENGTH = 8
 
+const (
+	StatusWrongFlag int = iota
+	StatusAlreadySolved
+	StatusCorrectFlag
+)
+
 var ErrDatabaseNotInitialized = errors.New("database not initialized")
 
 func UserExists(username string) bool {
@@ -78,7 +84,7 @@ func RegisterUser(username, email, password string) error {
 
 func LoginUser(username, password string) (string, error) {
 	if db == nil {
-		return "", fmt.Errorf("database not initialized")
+		return "", ErrDatabaseNotInitialized
 	}
 
 	rows, err := db.Query("SELECT apikey, salt, password FROM users WHERE username = ?", username)
@@ -117,7 +123,7 @@ func LoginUser(username, password string) (string, error) {
 
 func GetUserByAPIKey(apiKey string) (*User, error) {
 	if db == nil {
-		return nil, fmt.Errorf("database not initialized")
+		return nil, ErrDatabaseNotInitialized
 	}
 
 	rows, err := db.Query("SELECT id, username, email, score, is_admin FROM users WHERE apikey = ?", apiKey)
@@ -147,7 +153,7 @@ func GetUserByAPIKey(apiKey string) (*User, error) {
 
 func GetUserByUsername(username string) (*User, error) {
 	if db == nil {
-		return nil, fmt.Errorf("database not initialized")
+		return nil, ErrDatabaseNotInitialized
 	}
 
 	rows, err := db.Query("SELECT id, email, score, is_admin FROM users WHERE username = ?", username)
@@ -176,7 +182,7 @@ func GetUserByUsername(username string) (*User, error) {
 
 func GetSolvesByUser(user *User) ([]*Solve, error) {
 	if db == nil {
-		return nil, fmt.Errorf("database not initialized")
+		return nil, ErrDatabaseNotInitialized
 	}
 
 	rows, err := db.Query("SELECT c.name, s.timestamp FROM solves AS s, challenges AS c WHERE s.chalid = c.id AND s.userid = ?", user.ID)
@@ -188,7 +194,12 @@ func GetSolvesByUser(user *User) ([]*Solve, error) {
 	solves := make([]*Solve, 0)
 	for rows.Next() {
 		var solve Solve
-		err = rows.Scan(&solve.ChalName, &solve.Timestamp)
+		var timestamp *string
+		err = rows.Scan(&solve.ChalName, &timestamp)
+		if err != nil {
+			return nil, err
+		}
+		solve.Timestamp, err = utils.ParseTime(timestamp)
 		if err != nil {
 			return nil, err
 		}
@@ -196,4 +207,117 @@ func GetSolvesByUser(user *User) ([]*Solve, error) {
 	}
 
 	return solves, nil
+}
+
+func challengeEsits(ID int) (bool, error) {
+	if db == nil {
+		return false, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT id FROM challenges WHERE id = ?", ID)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	return rows.Next(), nil
+}
+
+func isChallengeSolved(user *User, chalID int) (bool, error) {
+	if db == nil {
+		return false, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT * FROM solves WHERE userid = ? AND chalid = ?", user.ID, chalID)
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+
+	return rows.Next(), nil
+}
+
+func getChallIfCorrectFlag(chalID int, flag string) (*Challenge, error) {
+	if db == nil {
+		return nil, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT name, solves FROM challenges WHERE id = ? AND flag = ?", chalID, flag)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return nil, nil
+	}
+
+	var chal Challenge
+	err = rows.Scan(&chal.Name, &chal.Solves)
+	if err != nil {
+		return nil, err
+	}
+
+	return &chal, nil
+}
+
+func SubmitFlag(user *User, chalID int, flag string) (int, error) {
+	if db == nil {
+		return StatusWrongFlag, ErrDatabaseNotInitialized
+	}
+
+	now := utils.CurrentTime()
+
+	status, err := challengeEsits(chalID)
+	if err != nil {
+		return StatusWrongFlag, err
+	}
+	if !status {
+		return StatusWrongFlag, fmt.Errorf("challenge not found")
+	}
+
+	status, err = isChallengeSolved(user, chalID)
+	if err != nil {
+		return StatusWrongFlag, err
+	}
+	if status {
+		_, err := db.Exec("INSERT INTO submissions (userid, chalid, status, flag, timestamp) VALUES (?, ?, ?, ?, ?)", user.ID, chalID, "r", flag, now)
+		if err != nil {
+			return StatusWrongFlag, err
+		}
+
+		return StatusAlreadySolved, fmt.Errorf("challenge already solved")
+	}
+
+	chal, err := getChallIfCorrectFlag(chalID, flag)
+	if err != nil {
+		return StatusWrongFlag, err
+	}
+	if chal == nil {
+		_, err := db.Exec("INSERT INTO submissions (userid, chalid, status, flag, timestamp) VALUES (?, ?, ?, ?, ?)", user.ID, chalID, "w", flag, now)
+		if err != nil {
+			return StatusWrongFlag, err
+		}
+
+		return StatusWrongFlag, nil
+	}
+
+	if chal.Solves == 0 && !user.IsAdmin {
+		log.Noticef("First Blood on %s from %s", chal.Name, user.Username)
+		// TODO: bot first blood
+	}
+
+	_, err = db.Exec("INSERT INTO submissions (userid, chalid, status, flag, timestamp) VALUES (?, ?, ?, ?, ?)", user.ID, chalID, "c", flag, now)
+	if err != nil {
+		log.Warningf("%d", 262)
+		return StatusWrongFlag, err
+	}
+
+	_, err = db.Exec("INSERT INTO solves (userid, chalid, timestamp) VALUES (?, ?, ?)", user.ID, chalID, now)
+	if err != nil {
+		log.Warningf("%d", 268)
+		return StatusWrongFlag, err
+	}
+
+	return StatusCorrectFlag, nil
 }

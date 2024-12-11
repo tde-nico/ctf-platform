@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"platform/log"
+	"strings"
+	"time"
 
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -42,4 +44,18 @@ func GetRand(size int) ([]byte, string, error) {
 func HashPassword(password string, salt []byte) string {
 	secret := pbkdf2.Key([]byte(password), salt, 10000, 32, sha256.New)
 	return BytesToHex(secret)
+}
+
+func CurrentTime() string {
+	return time.Now().Format("2006-01-02 15:04:05.000000")
+}
+
+func ParseTime(timeStr *string) (time.Time, error) {
+	if timeStr == nil {
+		return time.Time{}, fmt.Errorf("time string is nil")
+	}
+	s := strings.ReplaceAll(*timeStr, "T", " ")
+	s = strings.ReplaceAll(s, "Z", "")
+	s += strings.Repeat("0", 26-len(s))
+	return time.Parse("2006-01-02 15:04:05.000000", s)
 }

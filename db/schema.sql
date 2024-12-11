@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 CREATE TABLE IF NOT EXISTS "solves" (
 	"userid" INTEGER NOT NULL,
 	"chalid" INTEGER NOT NULL,
-	"timestamp" DATETIME,
+	"timestamp" DATETIME NOT NULL,
 	PRIMARY KEY ("userid", "chalid"),
 	FOREIGN KEY("userid") REFERENCES "users"("id"),
 	FOREIGN KEY("chalid") REFERENCES "challenges"("id")
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS "submissions" (
 	"chalid" INTEGER,
 	"status" VARCHAR(1),
 	"flag" TEXT,
-	"timestamp" DATETIME,
+	"timestamp" DATETIME NOT NULL,
 	FOREIGN KEY("chalid") REFERENCES "challenges"("id"),
 	FOREIGN KEY("userid") REFERENCES "users"("id"),
 	PRIMARY KEY("id")

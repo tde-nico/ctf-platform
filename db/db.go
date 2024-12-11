@@ -23,6 +23,8 @@ func InitDB(path string) {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
 
+	db.SetMaxOpenConns(1)
+
 	log.Noticef("Successfully connected to the database")
 }
 
