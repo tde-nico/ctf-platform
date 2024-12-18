@@ -57,8 +57,29 @@ func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	}
 }
 
+type ScoresData struct {
+	Data
+	Users []db.UserScore
+}
+
 func scores(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	log.Infof("scores")
+	tmpl, err := getTemplate(w, "scores")
+	if err != nil {
+		return
+	}
+
+	users, err := db.GetScoreUsers()
+	if err != nil {
+		log.Errorf("Error getting users: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	data := ScoresData{Data: Data{}}
+	data.Users = users
+	data.User = getSessionUser(s)
+
+	executeTemplate(w, r, s, tmpl, &data)
 }
 
 func graphData(w http.ResponseWriter, r *http.Request, s *sessions.Session) {

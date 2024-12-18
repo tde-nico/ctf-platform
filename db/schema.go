@@ -38,9 +38,11 @@ type Challenge struct {
 }
 
 type Solve struct {
-	UserID    int
-	ChalName  string
-	Timestamp time.Time
+	UserID       int
+	ChalName     string
+	ChalCategory string
+	ChalExtra    bool
+	Timestamp    time.Time
 }
 
 type Submission struct {
@@ -49,6 +51,18 @@ type Submission struct {
 	Status       string
 	Flag         string
 	Timestamp    time.Time
+}
+
+type Badges struct {
+	Name  string
+	Char  string
+	Extra bool
+}
+
+type UserScore struct {
+	Username string
+	Score    int
+	Badges   []Badges
 }
 
 var CATEGORIES = []string{

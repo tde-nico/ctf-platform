@@ -185,7 +185,7 @@ func GetSolvesByUser(user *User) ([]*Solve, error) {
 		return nil, ErrDatabaseNotInitialized
 	}
 
-	rows, err := db.Query("SELECT c.name, s.timestamp FROM solves AS s, challenges AS c WHERE s.chalid = c.id AND s.userid = ?", user.ID)
+	rows, err := db.Query("SELECT c.name, c.category, c.is_extra, s.timestamp FROM solves AS s, challenges AS c WHERE s.chalid = c.id AND s.userid = ?", user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func GetSolvesByUser(user *User) ([]*Solve, error) {
 	for rows.Next() {
 		var solve Solve
 		var timestamp *string
-		err = rows.Scan(&solve.ChalName, &timestamp)
+		err = rows.Scan(&solve.ChalName, &solve.ChalCategory, &solve.ChalExtra, &timestamp)
 		if err != nil {
 			return nil, err
 		}
@@ -320,4 +320,106 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 	}
 
 	return StatusCorrectFlag, nil
+}
+
+func getVisibleChallsByCategory() (map[string][]int, error) {
+	if db == nil {
+		return nil, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT category, COUNT(*), SUM(is_extra) FROM challenges WHERE hidden=0 GROUP BY category")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	challs := make(map[string][]int)
+	for rows.Next() {
+		var name string
+		var count, extra int
+		err = rows.Scan(&name, &count, &extra)
+		if err != nil {
+			return nil, err
+		}
+		challs[name] = []int{count - extra, extra}
+	}
+
+	return challs, nil
+
+}
+
+func GetScoreUsers() ([]UserScore, error) {
+	if db == nil {
+		return nil, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT id, username, score FROM users WHERE is_admin=0 ORDER BY score DESC")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := make([]*User, 0)
+	for rows.Next() {
+		var user User
+		err = rows.Scan(&user.ID, &user.Username, &user.Score)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, &user)
+	}
+
+	challs, err := getVisibleChallsByCategory()
+	if err != nil {
+		return nil, err
+	}
+
+	scoreUsers := make([]UserScore, len(users))
+	for i, user := range users {
+		scoreUsers[i].Username = user.Username
+		scoreUsers[i].Score = user.Score
+
+		solves, err := GetSolvesByUser(user)
+		if err != nil {
+			return nil, err
+		}
+
+		counter := make(map[string][]int)
+		for _, s := range solves {
+			c, ok := counter[s.ChalCategory]
+			if !ok {
+				c = []int{0, 0}
+			}
+			if s.ChalExtra {
+				c[1]++
+			} else {
+				c[0]++
+			}
+			counter[s.ChalCategory] = c
+		}
+
+		for category, counts := range counter {
+			if category == "Intro" {
+				continue
+			}
+
+			challCounts, ok := challs[category]
+			if !ok {
+				continue
+			}
+			if challCounts[0] == counts[0] {
+				scoreUsers[i].Badges = append(scoreUsers[i].Badges, Badges{
+					Name:  category,
+					Char:  string(category[0]),
+					Extra: false,
+				})
+				if challCounts[1] > 0 && challCounts[1] == counts[1] {
+					scoreUsers[i].Badges[len(scoreUsers[i].Badges)-1].Extra = true
+				}
+			}
+		}
+
+	}
+
+	return scoreUsers, nil
 }

@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block content %}
+{{define "content"}}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
@@ -22,37 +22,37 @@
         <tbody class="my-5">
             <tr height="15px"></tr>
 
-            {% for user in users %}
+            {{ range $i, $user := .Users }}
             <tr class="table-dark" style="color:black">
                 <th scope="row">
 
-                    {% if loop.index < 4 %}
+                    {{ if (lt $i 3) }}
 
-                        {% if loop.index == 1 %}
-                        <img src="static/images/crown-gold.png" class="img-responsive rank-crown" />
-                        {% elif loop.index == 2 %}
-                        <img src="static/images/crown-silver.png" class="img-responsive rank-crown" />
-                        {% elif loop.index == 3 %}
-                        <img src="static/images/crown-bronze.png" class="img-responsive rank-crown" />
-                        {% endif %}
+                        {{ if (eq $i 0) }}
+                            <img src="static/images/crown-gold.png" class="img-responsive rank-crown" />
+                        {{ else if (eq $i 1) }}
+                            <img src="static/images/crown-silver.png" class="img-responsive rank-crown" />
+                        {{ else if (eq $i 2) }}
+                            <img src="static/images/crown-bronze.png" class="img-responsive rank-crown" />
+                        {{ end }}
 
-                        <a href="/user/{{ user[0] }}" style="color: black;">{{ user[0] }}</a>
+                        <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
                     
-                    {% else %}
-                        {{ loop.index }}.
-                        <a href="/user/{{ user[0] }}" style="color: black;">{{ user[0] }}</a>
-                    {% endif %}
+                    {{ else }}
+                        {{ $i }}.
+                        <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
+                    {{ end }}
 
-                    {% for badge in user[3] %}
-                        <span class="category_badge {% if badge[1] %}extra-badge{% endif %}" data-toggle="tooltip" data-placement="top" title="{{ user[0] }} solved all the currently available {{ badge[0] }} challenges!">
-                            {{ badge[0][0] }}
+                    {{ range $badge := $user.Badges }}
+                        <span class="category_badge {{ if $badge.Extra }}extra-badge{{ end }}" data-toggle="tooltip" data-placement="top" title="{{ $user.Username }} solved all the currently available {{ $badge.Name }} challenges!">
+                            {{ $badge.Char }}
                         </span>
-                    {% endfor %}
+                    {{ end }}
 
                 </th>
-                <td>{{ user[1] }}</td>
+                <td>{{ $user.Score }}</td>
             </tr>
-            {% endfor %}
+            {{ end }}
         </tbody>
     </table>
 </div>
@@ -122,4 +122,5 @@ $.ajax('/graph_data', {
     }
 });
 </script>
-{% endblock %}
+
+{{ end }}

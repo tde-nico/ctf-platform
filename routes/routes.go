@@ -82,7 +82,7 @@ func StartRouting() {
 
 	authHandleFunc("GET /user/{username}", userInfo)
 	authHandleFunc("GET /challenges", challenges)
-	authHandleFunc("POST /submit", submit)        // TODO
+	authHandleFunc("POST /submit", submit)
 	authHandleFunc("GET /scores", scores)         // TODO
 	authHandleFunc("POST /graph_data", graphData) // TODO
 	// authHandleFunc("GET /newpw", home)
