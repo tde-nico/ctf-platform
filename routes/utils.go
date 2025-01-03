@@ -77,6 +77,18 @@ func getSessionUser(s *sessions.Session) *db.User {
 	return user
 }
 
+func checkValidSession(s *sessions.Session) error {
+	val := s.Values["apikey"]
+	apiKey, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("invalid session")
+	}
+	if strings.HasPrefix(apiKey, db.INVALID_PREFIX) {
+		return fmt.Errorf("invalid session")
+	}
+	return nil
+}
+
 func addFlash(s *sessions.Session, args ...string) {
 	if len(args) < 1 || len(args) > 2 {
 		return

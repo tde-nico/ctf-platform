@@ -9,6 +9,7 @@ import (
 
 const APIKEY_LENGTH = 32
 const SALT_LENGTH = 8
+const INVALID_PREFIX = "INVALID_"
 
 const (
 	StatusWrongFlag int = iota
@@ -52,17 +53,89 @@ func EmailExists(email string) bool {
 
 func createUser(username, email, salt, secret, apiKey string) error {
 	if db == nil {
-		log.Error("Database not initialized")
 		return ErrDatabaseNotInitialized
 	}
 
 	_, err := db.Exec("INSERT INTO users (username, email, salt, password, apikey, score, is_admin) VALUES (?, ?, ?, ?, ?, 0, 0)", username, email, salt, secret, apiKey)
 	if err != nil {
-		log.Errorf("Error inserting user: %v", err)
 		return err
 	}
 
 	return nil
+}
+
+func checkIfUserExists(username string) error {
+	if db == nil {
+		return ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT * FROM users WHERE username = ?", username)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	if !rows.Next() {
+		return fmt.Errorf("user not found")
+	}
+
+	return nil
+}
+
+func updatePassword(username, salt, secret, apiKey string) error {
+	if db == nil {
+		return ErrDatabaseNotInitialized
+	}
+
+	_, err := db.Exec("UPDATE users SET salt = ?, password = ?, apikey = ? WHERE username=?", salt, secret, apiKey, username)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ChangePassword(username, password string, invalid bool) error {
+	_, apiKeyHex, err := utils.GetRand(APIKEY_LENGTH)
+	if err != nil {
+		return err
+	}
+
+	salt, saltHex, err := utils.GetRand(SALT_LENGTH)
+	if err != nil {
+		return err
+	}
+	secretHex := utils.HashPassword(password, salt)
+
+	apiKey := string(apiKeyHex)
+	if invalid {
+		apiKey = INVALID_PREFIX + apiKey
+	}
+	err = updatePassword(username, string(saltHex), string(secretHex), apiKey)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ResetPassword(username string) (string, error) {
+	err := checkIfUserExists(username)
+	if err != nil {
+		return "", err
+	}
+
+	_, password, err := utils.GetRand(SALT_LENGTH)
+	if err != nil {
+		return "", err
+	}
+
+	err = ChangePassword(username, password, true)
+	if err != nil {
+		return "", err
+	}
+
+	return password, nil
 }
 
 func RegisterUser(username, email, password string) error {

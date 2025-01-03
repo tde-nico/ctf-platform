@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"platform/db"
 	"platform/log"
@@ -172,7 +173,29 @@ func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 }
 
 func adminResetPw(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	log.Infof("adminResetPw")
+	err := r.ParseForm()
+	if err != nil {
+		log.Errorf("Error parsing form: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	username := r.FormValue("username")
+	password, err := db.ResetPassword(username)
+	if err != nil {
+		log.Errorf("Error resetting password: %v", err)
+		addFlash(s, "Error resetting password")
+		if saveSession(w, r, s) {
+			http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		}
+		return
+	}
+
+	msg := fmt.Sprintf("Temporary password [%s]: %s", username, password)
+	addFlash(s, msg, "success")
+	if saveSession(w, r, s) {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+	}
 }
 
 func adminConfig(w http.ResponseWriter, r *http.Request, s *sessions.Session) {

@@ -34,6 +34,11 @@ func authHandleFunc(pattern string, handler func(w http.ResponseWriter, r *http.
 			return
 		}
 
+		if checkValidSession(s) != nil {
+			http.Redirect(w, r, "/newpw", http.StatusSeeOther)
+			return
+		}
+
 		handler(w, r, s)
 	})
 }
@@ -77,22 +82,21 @@ func StartRouting() {
 	handleFunc("POST /register", register_post)
 	handleFunc("GET /login", login_get)
 	handleFunc("POST /login", login_post)
+	handleFunc("GET /newpw", newpw_get)
+	handleFunc("POST /newpw", newpw_post)
 
 	authHandleFunc("GET /logout", logout)
-
 	authHandleFunc("GET /user/{username}", userInfo)
 	authHandleFunc("GET /challenges", challenges)
 	authHandleFunc("POST /submit", submit)
 	authHandleFunc("GET /scores", scores)
 	authHandleFunc("POST /graph_data", graphData)
-	// authHandleFunc("GET /newpw", home)
-	// authHandleFunc("POST /newpw", home)
 
 	adminHandleFunc("GET /admin", admin)
 	adminHandleFunc("POST /admin/newchal", adminNewChall)
 	adminHandleFunc("POST /admin/updatechal", adminUpdateChall)
 	adminHandleFunc("POST /admin/deletechal", adminDeleteChall)
-	adminHandleFunc("POST /admin/resetpw", adminResetPw) // TODO
+	adminHandleFunc("POST /admin/resetpw", adminResetPw)
 	adminHandleFunc("POST /admin/config", adminConfig)
 
 	log.Notice("Serving on :8888")
