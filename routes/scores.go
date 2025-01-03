@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"encoding/json"
 	"net/http"
 	"platform/db"
 	"platform/log"
@@ -9,6 +10,11 @@ import (
 
 	"github.com/gorilla/sessions"
 )
+
+type GraphPoint struct {
+	X string `json:"x"`
+	Y int    `json:"y"`
+}
 
 func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	err := r.ParseForm()
@@ -83,5 +89,34 @@ func scores(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 }
 
 func graphData(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	log.Infof("graphData")
+	data, err := db.GetGraphData()
+	if err != nil {
+		log.Errorf("Error getting graph data: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	jsonData := make(map[string][]GraphPoint)
+	for _, d := range data {
+		if len(jsonData[d.User]) == 0 {
+			point := GraphPoint{
+				X: data[0].Timestamp.Format("2006-01-02 15:04:05"),
+				Y: 0,
+			}
+			jsonData[d.User] = append(jsonData[d.User], point)
+		}
+		point := GraphPoint{
+			X: d.Timestamp.Format("2006-01-02 15:04:05"),
+			Y: jsonData[d.User][len(jsonData[d.User])-1].Y + d.Points,
+		}
+		jsonData[d.User] = append(jsonData[d.User], point)
+	}
+
+	j, err := json.Marshal(jsonData)
+	if err != nil {
+		log.Errorf("Error marshaling json: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write(j)
 }

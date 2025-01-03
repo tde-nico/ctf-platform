@@ -65,6 +65,12 @@ type UserScore struct {
 	Badges   []Badges
 }
 
+type GraphData struct {
+	User      string
+	Points    int
+	Timestamp time.Time
+}
+
 var CATEGORIES = []string{
 	"Web",
 	"Crypto",

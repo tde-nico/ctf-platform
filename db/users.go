@@ -56,7 +56,7 @@ func createUser(username, email, salt, secret, apiKey string) error {
 		return ErrDatabaseNotInitialized
 	}
 
-	_, err := db.Exec("INSERT INTO users (username, email, salt, password, apikey) VALUES (?, ?, ?, ?, ?)", username, email, salt, secret, apiKey)
+	_, err := db.Exec("INSERT INTO users (username, email, salt, password, apikey, score, is_admin) VALUES (?, ?, ?, ?, ?, 0, 0)", username, email, salt, secret, apiKey)
 	if err != nil {
 		log.Errorf("Error inserting user: %v", err)
 		return err
@@ -422,4 +422,33 @@ func GetScoreUsers() ([]UserScore, error) {
 	}
 
 	return scoreUsers, nil
+}
+
+func GetGraphData() ([]GraphData, error) {
+	if db == nil {
+		return nil, ErrDatabaseNotInitialized
+	}
+
+	rows, err := db.Query("SELECT u.username, c.points, s.timestamp FROM users AS u, solves AS s, challenges AS c WHERE u.is_admin=0 AND s.userid=u.id AND s.chalid=c.id ORDER BY s.timestamp")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := make([]GraphData, 0)
+	for rows.Next() {
+		var tmp GraphData
+		var timestamp *string
+		err = rows.Scan(&tmp.User, &tmp.Points, &timestamp)
+		if err != nil {
+			return nil, err
+		}
+		tmp.Timestamp, err = utils.ParseTime(timestamp)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, tmp)
+	}
+
+	return data, nil
 }
