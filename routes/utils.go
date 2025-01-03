@@ -118,6 +118,7 @@ func getTemplate(w http.ResponseWriter, page string) (*template.Template, error)
 		"is_visible_category": is_visible_category,
 		"split":               func(sep string, s string) []string { return strings.Split(s, sep) },
 		"last":                func(s []string) string { return s[len(s)-1] },
+		"inc":                 func(i int) int { return i + 1 },
 	}
 
 	tmpl, err := template.New("").Funcs(funcMap).ParseFiles("templates/base.html", fmt.Sprintf("templates/%s.html", page))

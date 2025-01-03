@@ -39,7 +39,7 @@
                         <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
                     
                     {{ else }}
-                        {{ $i }}.
+                        {{ inc $i }}.
                         <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
                     {{ end }}
 
