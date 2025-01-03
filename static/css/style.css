@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'pixelated';
+    src: url('/font/oswald.regular.ttf');
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 .download_icon {
     padding: 8px;
     border-radius: 5px;
@@ -18,7 +30,7 @@
 }
 
 .category_badge {
-    background-color: #4BB543;
+    background-color: #a6e3a1;
     aspect-ratio: 1;
     border-radius: 50%;
     height: 1.5em;
@@ -27,7 +39,7 @@
     text-align: center;
 }
 .extra-badge {
-    background-color: #FF6C33;
+    background-color: #fab387;
     animation: burn 1.5s linear infinite alternate;
 }
 @keyframes burn {
@@ -93,4 +105,108 @@
 }
 @media screen and (max-width: 1000px) {
     .challform > div.multifield { flex-direction: column; }
+}
+
+/* Leaderboard */
+.leaderboard-username {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Challenges */
+.grid{
+    margin: 20px;
+}
+.grid-item {
+    height: 100px;
+    width: 260px;
+    margin: 20px;
+    background-image: linear-gradient(45deg, #181825 0%, #5c2a9e 150%);
+    border-radius: 5px;
+    border: solid;
+    border-color: #7c7f93;
+    border-width: 2px;
+    border-image-slice: 1;
+    transition: border-color 0.3s ease-in-out, background-image 0.3s ease-in-out;
+}
+.grid-item:hover {
+    border-color: #b4befe;
+    background-image: linear-gradient(120deg, #181825 0%, #5c2a9e 150%);
+}
+.chall-title {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5em;
+}
+.chall-footer{
+    display: flex;
+    justify-content: space-between;
+}
+.chall-points{
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5em;
+}
+.chall-difficulty {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5em;
+}
+
+
+/* Navbar */
+.navbar {
+    background-color: #181825;
+    color: #eff1f5;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 70px;
+}
+.navbar-brand {
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5em;
+    color: #eff1f5;
+}
+.login-form {
+    background-color: #181825 !important;
+    color: #cdd6f4 !important;
+    padding: 20px;
+    border-radius: 5px;
+    border-color: #7c7f93;
+}
+.login-form .incorrect {
+    border-color: #e64553;
+}
+.login-form-field {
+    background-color: #11111b !important;
+    color: #cdd6f4 !important;
+}
+.login-form-field::placeholder {
+    color: #7c7f93 !important;
+}
+
+
+/* page */
+.main-content {
+    background-color: #11111b;
+    color: #cdd6f4;
+}
+
+/* Scoreboard */
+.scoreboard-username {
+    text-decoration: none;
+    color: inherit;
+    font-family: 'Pixelify Sans', sans-serif, monospace;
+}
+.table {
+    --bs-table-bg: inherit !important;
+    color: #cdd6f4;
+}
+.scoreboard-chart {
+    color: #cdd6f4;
+}
+
+
+/* footer */
+.footer {
+    background-color: #11111b;
+    color: #4c4f69;
+    padding: 20px;
 }

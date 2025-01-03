@@ -1,62 +1,88 @@
 {{define "base"}}
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="dark">
 
 <head>
     <title>CyberChallenge CTF Platform</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/bootstrap4-toggle.min.css">
-    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.min.css">
+
+
+    <!-- pixelated font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <!--css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="icon" href="/static/images/cc_logo.png">
-    <script src="/static/js/jquery-3.4.1.min.js"></script>
-    <script src="/static/js/popper.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/bootstrap4-toggle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--scripts for jquery and bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+    <script src="/static/js/navbar.js"></script>
+    
+
 </head>
 
 <body style="font-family: monospace">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/" style="color: grey">
-            <img src="/static/images/cc_logo.png" alt="" style="height: 2em;">
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="/">
+            <img src="/static/images/flag.gif" alt="" style="height: 2em;">
             Cyber Challenge Sapienza CTF
         </a>
+        <div class="ms-auto">
         
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbartoggler" aria-controls="navbartoggler" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbartoggler">
-            <ul class="navbar-nav ml-auto">
+            <ul class="navbar-nav">
 
             {{ if .User }}
-                <li class="nav-item my-auto mx-5">
-                    <a class="nav-link" href="/user/{{ .User.Username }}">{{ .User.Username }} - {{ .User.Score }} points</a>
-                </li>
 
                 {{ if .User.IsAdmin }}
                 <li class="nav-item my-auto">
-                    <a class="nav-link" href="/admin">Control Panel</a>
+                    <a class="nav-link" href="/admin">DevTools <i class="bi bi-gear-fill"></i></a>
                 </li>
                 {{ end }}
-
                 <li class="nav-item my-auto">
-                    <a class="nav-link" href="/scores">Scores</a>
+                    <a class="nav-link" href="/scores">Leaderboard <i class="bi bi-person-lines-fill"></i></a>
                 </li>
                 <li class="nav-item my-auto">
-                    <a class="nav-link" href="/challenges">Challenges</a>
+                    <a class="nav-link" href="/challenges">Challenges <i class="bi bi-joystick"></i></a>
                 </li>
-                <li class="nav-item my-auto">
-                    <a class="nav-link" href="/logout">Logout</a>
+                <li class="nav-item my-auto mx-5">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ .User.Username}}</a>
+                    <div class="dropdown-menu dropdown-menu-end p-4">
+                        <a class="dropdown-item" href="/user/{{ .User.Username }}">Profile <i class="bi bi-person-fill"></i></a>
+                        <a class="dropdown-item" href="/logout">Logout <i class="bi bi-door-closed-fill"></i></a>
+                    </div>
                 </li>
             {{ else }}
                 <li class="nav-item my-auto">
-                    <a class="nav-link" href="/register">Registration</a>
+                    <a class="nav-link" href="/register">Register<i class="bi bi-person-fill-check"></i> </a>
                 </li>
                 <li class="nav-item my-auto">
-                    <a class="nav-link" href="/login">Login</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Login
+                        <i class="bi bi-person-fill-check"></i>
+                    </a>
+                    <form class="dropdown-menu dropdown-menu-end p-4 login-form" action="/login" method="post" onsubmit="event.preventDefault(); loginUser();">
+                        <div class="form-group">
+                            <label for="LoginUsername">Username</label>
+                            <input type="text" class="form-control login-form-field" id="LoginUsername" name="username" placeholder="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="LoginPassword">Password</label>
+                            <input type="password" class="form-control login-form-field" id="LoginPassword" name="password" placeholder="password" required>
+                        </div>
+                        <div class="form-group form-check text-end p-1">
+                            <button type="submit" class="btn btn-primary" onclick="event.stopPropagation();">Sign in</button>
+                        </div>
+                    </form>
                 </li>
             {{ end }}
             
@@ -75,7 +101,7 @@
         {{ end }}
     {{ end }}
 
-    <div class="w-100">
+    <div class="w-100 h-100 main-content">
         <br> {{template "content" .}}
         <br>
     </div>
@@ -89,6 +115,10 @@
             });
         });
     </script>
+
+    <footer class="d-flex flex-wrap justify-content-between align-items-center footer">
+        <p class="col-md-4 mb-0">© 2025 TheRomanXpl0it</p>
+      </footer>
 </body>
 </html>
 {{end}}

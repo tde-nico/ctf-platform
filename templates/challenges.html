@@ -6,29 +6,33 @@
 
 {{ $user := .User }}
 {{ $solves := .Solves }}
-
 {{ range $cat, $chals := .Challenges }} {{ if or ($chals | is_visible_category) $user.IsAdmin }}
-    <h3 class="ml-5 mt-5"> {{ $cat }} </h3>
-    <div class="row mx-auto mb-5" style="width:95%">
+    <h3 class="text-center"> {{ $cat }} </h3>
+
+    <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
         {{ range $i, $chal :=  $chals }}
             {{ if or (not $chal.Hidden) $user.IsAdmin }}
-            <div class="col-md-3 py-5">
+            <div class="chall-box grid-item">
                 {{ if not (index $solves $chal.Name) }}
-                    <button class="btn {{ if $chal.Hidden }} btn-secondary {{ else }} btn-dark {{ end }} w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ end }}>
+                    <button class="btn {{ if $chal.Hidden }} chall-hidden {{ else }} challpreview {{ end }} w-100 h-100 " name="{{ $chal.ID }}" {{ if $chal.IsExtra }} {{ end }}>
                 {{ else }}
-                    <button class="btn w-100 h-100 chalpreview my-2" name="{{ $chal.ID }}" style="background-color: palegreen">
+                    <button class="btn w-100 h-100 challpreview" name="{{ $chal.ID }}">
                 {{ end }}
                         {{ if $chal.IsExtra }}
                             <div class="animated-rainbow">EXTRA</div>
                         {{ end }}
-                        <h4> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
-                        <h5> {{ $chal.Points }} ({{ $chal.Difficulty }})</h5>
+                        <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
+                        <div class="chall-footer">
+                            <h5 class="chall-points">{{ $chal.Points }}pt</h5>
+                            <h5 class="chall-difficulty">{{ $chal.Difficulty }}</h5>
+                        </div>
                     </button>
             </div>
             {{ end }}
         {{ end }}
     </div>
 {{ end }} {{ end }}
+
 
 {{ range $cat, $chals := .Challenges }}
     {{ range $chal := $chals }}

@@ -2,28 +2,31 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
-
+<script>
+    Chart.defaults.global.defaultFontColor = '#cdd6f4';
+</script>
+<h3 class="text-center">Hall of Fame</h3>
 <div class="container my-5">
     <div>
-        <canvas id="chart"></canvas>
+        <canvas id="chart" class="scoreboard-chart"></canvas>
     </div>
 </div>
 
 <div class="container my-5">
-    <h3>Hall of Fame</h3>
+    
     <br>
     <table class="table table-hover">
         <thead>
             <tr class="table-default">
-                <th scope="col">Username</th>
-                <th scope="col">Score</th>
+                <th scope="col" class="scoreboard-username">Username</th>
+                <th scope="col" class="scoreboard-score">Score</th>
             </tr>
         </thead>
         <tbody class="my-5">
             <tr height="15px"></tr>
 
             {{ range $i, $user := .Users }}
-            <tr class="table-dark" style="color:black">
+            <tr class="table">
                 <th scope="row">
 
                     {{ if (lt $i 3) }}
@@ -36,11 +39,11 @@
                             <img src="static/images/crown-bronze.png" class="img-responsive rank-crown" />
                         {{ end }}
 
-                        <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
+                        <a href="/user/{{ $user.Username }}" class="scoreboard-username">{{ $user.Username }}</a>
                     
                     {{ else }}
                         {{ inc $i }}.
-                        <a href="/user/{{ $user.Username }}" style="color: black;">{{ $user.Username }}</a>
+                        <a href="/user/{{ $user.Username }}" class="scoreboard-username">{{ $user.Username }}</a>
                     {{ end }}
 
                     {{ range $badge := $user.Badges }}
