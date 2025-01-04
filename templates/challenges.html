@@ -7,24 +7,32 @@
 {{ $user := .User }}
 {{ $solves := .Solves }}
 {{ range $cat, $chals := .Challenges }} {{ if or ($chals | is_visible_category) $user.IsAdmin }}
-    <h3 class="text-center"> {{ $cat }} </h3>
+    {{ if eq $cat "Crypto" }}
+        <h3 class="text-center"> {{ $cat }} <i class="bi bi-unlock-fill"></i> </h3>
+    {{ else if eq $cat "Web" }}
+        <h3 class="text-center"> {{ $cat }} <i class="bi bi-browser-safari"></i> </h3>
+    {{ else if eq $cat "Reverse" }}
+        <h3 class="text-center"> {{ $cat }} <i class="bi bi-wrench-adjustable"></i> </h3>
+    {{ else if eq $cat "Pwn" }}
+        <h3 class="text-center"> {{ $cat }} <i class="bi bi-file-earmark-binary-fill"></i> </h3>
+    {{ else if eq $cat "Intro" }}
+        <h3 class="text-center"> {{ $cat }} <i class="bi bi-play-fill"></i> </h3>
+    {{ else }}
+        <h3 class="text-center"> {{ $cat }} </h3>
+    {{ end }}
 
     <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
         {{ range $i, $chal :=  $chals }}
             {{ if or (not $chal.Hidden) $user.IsAdmin }}
-            <div class="chall-box grid-item">
+            <div class="chall-box grid-item  chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }}">
                 {{ if not (index $solves $chal.Name) }}
-                    <button class="btn {{ if $chal.Hidden }} chall-hidden {{ else }} challpreview {{ end }} w-100 h-100 " name="{{ $chal.ID }}" {{ if $chal.IsExtra }} {{ end }}>
+                    <button class="btn {{ if $chal.Hidden }} chall-hidden {{ else }} chall-preview {{ end }} w-100 h-100 " name="{{ $chal.ID }}" {{ if $chal.IsExtra }} {{ end }}>
                 {{ else }}
-                    <button class="btn w-100 h-100 challpreview" name="{{ $chal.ID }}">
+                    <button class="btn w-100 h-100 chall-preview" name="{{ $chal.ID }}">
                 {{ end }}
-                        {{ if $chal.IsExtra }}
-                            <div class="animated-rainbow">EXTRA</div>
-                        {{ end }}
                         <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
                         <div class="chall-footer">
                             <h5 class="chall-points">{{ $chal.Points }}pt</h5>
-                            <h5 class="chall-difficulty">{{ $chal.Difficulty }}</h5>
                         </div>
                     </button>
             </div>
@@ -37,7 +45,7 @@
 {{ range $cat, $chals := .Challenges }}
     {{ range $chal := $chals }}
         {{ if or (not $chal.Hidden) $user.IsAdmin }}
-<div class="d-none {{ $chal.ID }} challtoggle position-fixed" style="width: 35%; top:50%; left:50%; transform: translate(-50%, -50%); border: 0px solid black; background-color: GhostWhite; border-radius:10px; color: DimGrey; box-shadow: 0px 0px 10px #888888;">
+<div class="d-none {{ $chal.ID }} chall-toggle position-fixed" >
     <div class="text-center">
         <h1 class="mt-4"> {{ $chal.Name }} </h1>
         <h3> Solves: {{ $chal.Solves }} </h3>
@@ -56,7 +64,7 @@
             {{ range $file := $files }}
                 <h6>
                     <a href="{{ $file }}" style="color: grey; text-decoration: none;">
-                        <i class="fa fa-download download_icon" aria-hidden="true"></i> {{ $file | split "/" | last }} </a>
+                        <i class="bi bi-file-earmark-arrow-down-fill"></i> {{ $file | split "/" | last }} </a>
                 </h6>
             {{ end }}
         {{ end }}
@@ -75,9 +83,9 @@
             <form class="mb-4" action="/submit" method="POST">
                 <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
                     <input type="hidden" name="challID" value="{{ $chal.ID }}">
-                    <input type="text" class="form-control challenge-flag" placeholder="flag" name="flag">
+                    <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
                     <div class="input-group-append">
-                        <button class="btn" type="submit" method="POST" style="background-color: silver">Submit</button>
+                        <button class="btn chall-submit" type="submit" >Submit</button>
                     </div>
                 </div>
             </form>
@@ -91,7 +99,7 @@
 {{ end }}
 
 <script>
-    $(".chalpreview").click(function(e) {
+    $(".chall-preview").click(function(e) {
         var modal = $("div." + e.currentTarget.name);
         modal.removeClass("d-none");
         var contents = modal.contents().find(".challenge-flag");
@@ -102,7 +110,7 @@
     });
 
     $(document).mouseup(function(e) {
-        var container = $("div.challtoggle");
+        var container = $("div.chall-toggle");
 
         if (!container.is(e.target) && container.has(e.target).length === 0) {
             container.addClass("d-none");

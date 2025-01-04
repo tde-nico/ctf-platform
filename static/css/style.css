@@ -121,17 +121,17 @@ body {
     height: 100px;
     width: 260px;
     margin: 20px;
-    background-image: linear-gradient(45deg, #181825 0%, #5c2a9e 150%);
+    background: linear-gradient(45deg, #181825 90%, #bac2de 120%);
     border-radius: 5px;
     border: solid;
-    border-color: #7c7f93;
-    border-width: 2px;
+    border-color: #181825;
+    border-width: 3px;
     border-image-slice: 1;
-    transition: border-color 0.3s ease-in-out, background-image 0.3s ease-in-out;
+    transition: border-color 0.3s ease-in-out;
+    box-shadow: 0 0 5px 1px #bac2de;
 }
 .grid-item:hover {
     border-color: #b4befe;
-    background-image: linear-gradient(120deg, #181825 0%, #5c2a9e 150%);
 }
 .chall-title {
     font-family: 'Pixelify Sans', sans-serif;
@@ -143,11 +143,62 @@ body {
 }
 .chall-points{
     font-family: 'Pixelify Sans', sans-serif;
-    font-size: 1.5em;
+    font-size: 1em;
+    position: absolute;
+    bottom: 0;
+    right: 5px;
 }
 .chall-difficulty {
     font-family: 'Pixelify Sans', sans-serif;
     font-size: 1.5em;
+}
+.chall-medium {
+    box-shadow: 0 0 5px 1px #fab387;
+    background: linear-gradient(45deg, #181825 90%, #fab387 120%);
+}
+.chall-medium:hover {
+    border-color: #fab387;
+}
+.chall-hard {
+    box-shadow: 0 0 5px 1px #f38ba8;
+    background: linear-gradient(45deg, #181825 90%, #f38ba8 120%);
+}
+.chall-hard:hover {
+    border-color: #f38ba8;
+}
+@keyframes rainbow {
+    0% { box-shadow: 0 0 10px 1px #f38ba8; }
+    16% { box-shadow: 0 0 10px 1px #fab387; }
+    33% { box-shadow: 0 0 10px 1px #e8ff00; }
+    50% { box-shadow: 0 0 10px 1px #5dff00; }
+    66% { box-shadow: 0 0 10px 1px #00ffb9; }
+    83% { box-shadow: 0 0 10px 1px #002eff; }
+    100% { box-shadow: 0 0 10px 1px #f38ba8; }
+}
+.chall-extra {
+    box-shadow: 0 0 5px 1px #a6e3a1;
+    animation: rainbow 3s infinite;
+}
+
+/* Chall cards*/
+.chall-toggle {
+    width: 35%;
+    top:50%; 
+    left:50%; 
+    transform: translate(-50%, -50%); 
+    border: 0px solid black; 
+    background-color: GhostWhite; 
+    border-radius:10px; 
+    color: DimGrey; 
+    box-shadow: 0px 0px 10px #888888;
+}
+.chall-flag {
+    border-radius: 10px;
+}
+.chall-submit {
+    border-top-left-radius: 0; 
+    border-bottom-left-radius: 0; 
+    background-color: silver;
 }
 
 
