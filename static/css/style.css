@@ -10,18 +10,6 @@ body {
     padding: 0;
 }
 
-.download_icon {
-    padding: 8px;
-    border-radius: 5px;
-    background-color: #343a40;
-    color: lightgray;
-}
-
-.fancy_download {
-    animation: fancy_download_colors 3s infinite;
-    background-color: red;
-}
-
 @keyframes fancy_download_colors {
     0% { background-color: red; }
     33% { background-color: blue; }
@@ -114,13 +102,13 @@ body {
 }
 
 /* Challenges */
-.grid{
-    margin: 20px;
-}
 .grid-item {
     height: 100px;
-    width: 260px;
+    width: 270px;
     margin: 20px;
+}
+
+.chall-preview {
     background: linear-gradient(45deg, #181825 90%, #bac2de 120%);
     border-radius: 5px;
     border: solid;
@@ -130,7 +118,7 @@ body {
     transition: border-color 0.3s ease-in-out;
     box-shadow: 0 0 5px 1px #bac2de;
 }
-.grid-item:hover {
+.chall-preview:hover {
     border-color: #b4befe;
 }
 .chall-title {
@@ -146,7 +134,7 @@ body {
     font-size: 1em;
     position: absolute;
     bottom: 0;
-    right: 5px;
+    right: 15px;
 }
 .chall-difficulty {
     font-family: 'Pixelify Sans', sans-serif;
@@ -160,24 +148,47 @@ body {
     border-color: #fab387;
 }
 .chall-hard {
-    box-shadow: 0 0 5px 1px #f38ba8;
-    background: linear-gradient(45deg, #181825 90%, #f38ba8 120%);
+    box-shadow: 0 0 5px 1px #d20f39;
+    background: linear-gradient(45deg, #181825 90%, #d20f39 120%);
 }
 .chall-hard:hover {
-    border-color: #f38ba8;
+    border-color: #d20f39;
 }
-@keyframes rainbow {
-    0% { box-shadow: 0 0 10px 1px #f38ba8; }
-    16% { box-shadow: 0 0 10px 1px #fab387; }
-    33% { box-shadow: 0 0 10px 1px #e8ff00; }
-    50% { box-shadow: 0 0 10px 1px #5dff00; }
-    66% { box-shadow: 0 0 10px 1px #00ffb9; }
-    83% { box-shadow: 0 0 10px 1px #002eff; }
-    100% { box-shadow: 0 0 10px 1px #f38ba8; }
+@keyframes flash {
+    0% { background: linear-gradient(45deg,#4c4f69 5%, #181825 10%); }
+    5%  { background: linear-gradient(45deg,#4c4f69 10%, #181825 15%); }
+    10%  { background: linear-gradient(45deg,#181825 0%, #4c4f69 10%, #181825 15%); }
+    15%  { background: linear-gradient(45deg,#181825 5%, #4c4f69 15%, #181825 20%); }
+    20% { background: linear-gradient(45deg,#181825 10%, #4c4f69 20%, #181825 25%); }
+    25% { background: linear-gradient(45deg,#181825 15%, #4c4f69 25%, #181825 30%); }
+    30% { background: linear-gradient(45deg,#181825 20%, #4c4f69 30%, #181825 35%); }
+    35% { background: linear-gradient(45deg,#181825 25%, #4c4f69 35%, #181825 40%); }
+    40% { background: linear-gradient(45deg,#181825 30%, #4c4f69 40%, #181825 45%); }
+    45% { background: linear-gradient(45deg,#181825 35%, #4c4f69 45%, #181825 50%); }
+    50% { background: linear-gradient(45deg,#181825 40%, #4c4f69 50%, #181825 55%); }
+    55% { background: linear-gradient(45deg,#181825 45%, #4c4f69 55%, #181825 60%); }
+    60% { background: linear-gradient(45deg,#181825 50%, #4c4f69 60%, #181825 65%); }
+    65% { background: linear-gradient(45deg,#181825 55%, #4c4f69 65%, #181825 70%); }
+    70% { background: linear-gradient(45deg,#181825 60%, #4c4f69 70%, #181825 75%); }
+    75% { background: linear-gradient(45deg,#181825 65%, #4c4f69 75%, #181825 80%); }
+    80% { background: linear-gradient(45deg,#181825 70%, #4c4f69 80%, #181825 85%); }
+    85% { background: linear-gradient(45deg,#181825 80%, #4c4f69 85%, #181825 90%); }
+    90% { background: linear-gradient(45deg,#181825 85%, #4c4f69 90%, #181825 95%); }
+    95% { background: linear-gradient(45deg,#181825 90%, #4c4f69 95%, #181825 100%); }
+    100% { background: linear-gradient(45deg,#181825 100%, #4c4f69 100%); }
+
 }
 .chall-extra {
+    animation: linear flash 1.5s infinite;
+    animation-delay: 2s;
+}
+.chall-solved{
     box-shadow: 0 0 5px 1px #a6e3a1;
-    animation: rainbow 3s infinite;
+    background: linear-gradient(45deg, #40a02b 90%, #00ffb9 120%);
+    border-color: #40a02b;
+}
+.chall-solved:hover {
+    border-color: #00ffb9;
 }
 
 /* Chall cards*/
@@ -185,20 +196,90 @@ body {
     width: 35%;
     top:50%; 
     left:50%; 
-    transform: translate(-50%, -50%); 
-    border: 0px solid black; 
-    background-color: GhostWhite; 
+    transform: translate(-50%, -50%);
+    background-color: #181825; 
     border-radius:10px; 
-    color: DimGrey; 
-    box-shadow: 0px 0px 10px #888888;
+    color: #cdd6f4; 
+    box-shadow: 0px 0px 10px #bac2de;
+    z-index: 1041;
+    animation: slideDown 0.2s ease-out forwards;
 }
+@keyframes slideDown {
+    0% {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%);
+        opacity: 1;
+    }
+}
+.chall-toggle-medium{
+    box-shadow: 0px 0px 10px #fab387;
+}
+.chall-toggle-hard{
+    box-shadow: 0px 0px 10px #f38ba8;
+}
+.chall-toggle-solved{
+    box-shadow: 0px 0px 10px #a6e3a1;
+    background: #40a02b; 
+}
+.chall-toggle-wrong{
+    position: relative;
+    animation: flashRed 0.5s ease-in-out 1;
+}
+@keyframes flashRed {
+    0% { background-color: #181825; }
+    10% { background-color: #d20f39; box-shadow: 0 0 10px #d20f39;}
+    100% { background-color: #181825; }
+}
+
 .chall-flag {
     border-radius: 10px;
 }
 .chall-submit {
     border-top-left-radius: 0; 
     border-bottom-left-radius: 0; 
-    background-color: silver;
+    background-color: #bac2de;
+    color: #181825; 
+}
+.chall-submit:hover {
+    background-color: #bac2de;
+    color: #191926;
+}
+.chall-dial-name{
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 2em;
+}
+.chall-dial-points{
+    font-size: 1.5em;
+}
+.chall-dial-attatchment{
+    color: #eff1f5;
+    text-decoration: none;
+}
+.chall-dial-netcat{
+    font-size: 1em;
+    font-weight: bold;
+}
+.chall-description{
+    background: #343a40;
+    border-radius: 3px;
+    border: 1px solid #4c4f69;
+}
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
+}
+.overlay.show {
+    display: block;
+    opacity: 1;
 }
 
 
@@ -260,4 +341,9 @@ body {
     background-color: #11111b;
     color: #4c4f69;
     padding: 20px;
+}
+
+/* Admin panels challenges */
+.card-header{
+    cursor: pointer;
 }

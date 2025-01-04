@@ -24,12 +24,8 @@
     <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
         {{ range $i, $chal :=  $chals }}
             {{ if or (not $chal.Hidden) $user.IsAdmin }}
-            <div class="chall-box grid-item  chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }}">
-                {{ if not (index $solves $chal.Name) }}
-                    <button class="btn {{ if $chal.Hidden }} chall-hidden {{ else }} chall-preview {{ end }} w-100 h-100 " name="{{ $chal.ID }}" {{ if $chal.IsExtra }} {{ end }}>
-                {{ else }}
-                    <button class="btn w-100 h-100 chall-preview" name="{{ $chal.ID }}">
-                {{ end }}
+            <div class="chall-box grid-item">
+                    <button class="btn chall-preview{{ if $chal.Hidden }} chall-hidden {{ else if (index $solves $chal.Name) }}  chall-solved {{ end }} w-100 h-100 chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }} " name="{{ $chal.ID }}">
                         <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
                         <div class="chall-footer">
                             <h5 class="chall-points">{{ $chal.Points }}pt</h5>
@@ -41,81 +37,85 @@
     </div>
 {{ end }} {{ end }}
 
-
+<div id="overlay" class="overlay"></div>
 {{ range $cat, $chals := .Challenges }}
     {{ range $chal := $chals }}
         {{ if or (not $chal.Hidden) $user.IsAdmin }}
-<div class="d-none {{ $chal.ID }} chall-toggle position-fixed" >
-    <div class="text-center">
-        <h1 class="mt-4"> {{ $chal.Name }} </h1>
-        <h3> Solves: {{ $chal.Solves }} </h3>
-        <h4> Points: {{ $chal.Points }} </h4>
-
-        <div class="mt-5 mb-3 ml-3 mr-3" style="text-decoration: none;">
-        {{ $rows := split "\n" $chal.Description }}
-        {{ range $index, $row := $rows }}
-            <h6 class="mb-0">{{ $row }}</h6>
-        {{ end }}
-        </div>
-
-        {{ if $chal.Files }}
-            </br>
-            {{ $files := split "," $chal.Files }}
-            {{ range $file := $files }}
-                <h6>
-                    <a href="{{ $file }}" style="color: grey; text-decoration: none;">
-                        <i class="bi bi-file-earmark-arrow-down-fill"></i> {{ $file | split "/" | last }} </a>
-                </h6>
-            {{ end }}
-        {{ end }}
-        {{ if and $chal.Host $chal.Port }}
-            <h6 class="my-3"> nc {{ $chal.Host }} {{ $chal.Port }} </h6>
-        {{ else if $chal.Host }}
-            <a href="{{ $chal.Host }}"><h6 class="my-3">{{ $chal.Host }}</h6></a>
-        {{ end }}
-        {{ if $chal.Hint1 }}
-            <p class="mt-5 mb-3">&bull; {{ $chal.Hint1 }} </p>
-        {{ end }}
-        {{ if $chal.Hint2 }}
-            <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
-        {{ end }}
-        {{ if not (index $solves $chal.Name) }}
-            <form class="mb-4" action="/submit" method="POST">
-                <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
-                    <input type="hidden" name="challID" value="{{ $chal.ID }}">
-                    <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
-                    <div class="input-group-append">
-                        <button class="btn chall-submit" type="submit" >Submit</button>
+            <div class="d-none {{ $chal.ID }} chall-toggle position-fixed chall-toggle-{{ $chal.Difficulty }} {{ if (index $solves $chal.Name) }} chall-toggle-solved {{ end }}">
+                <i class="bi bi-x-lg position-absolute top-0 end-0 m-3 chall-close" style="cursor: pointer;"></i>
+                <div class="text-center p-4">
+                    <h1 class="chall-dial-name"> {{ $chal.Name }} </h1>
+                    <h5 class="chall-dial-difficulty"> {{ $chal.Difficulty }}</h5>
+                    <div class="chall-dial-info d-flex justify-content-between">
+                        <h3 class="chall-dial-solves"> {{ $chal.Solves }} Solves</h3>
+                        <h4 class="chall-dial-points"> {{ $chal.Points }} Points</h4>
                     </div>
-                </div>
-            </form>
-        {{ else }}
-            <h6 class="my-4"> Challenge already solved</h6>
-        {{ end }}
-        </div>
-</div>
+                    
+                    
+                    <div class="mt-3 mb-3 ml-3 mr-3" style="text-decoration: none;">
+                        {{ if eq $chal.Description ""}}
+                        {{ else }}
+                            <div class="chall-description">
+                                <div class="p-2">
+                                {{ $rows := split "\n" $chal.Description }}
+                                {{ range $index, $row := $rows }}
+                                    <h6 class="mb-0">{{ $row }}</h6>
+                                {{ end }}
+                                </div>
+                            </div>
+                        {{ end }}
+                    </div>
+                
+
+                    {{ if $chal.Files }}
+                        <div class="chall-dial-attatchments text-start">
+                            <h4>Attachments:</h4>
+                            {{ $files := split "," $chal.Files }}
+                            {{ range $file := $files }}
+                                <div>
+                                    <a href="{{ $file }}" class="chall-dial-attatchment">
+                                        <i class="bi bi-file-earmark-arrow-down-fill"></i> {{ $file | split "/" | last }}
+                                    </a>
+                                </div>
+                            {{ end }}
+                        </div>
+                    {{ end }}
+                    {{ if and $chal.Host $chal.Port }}
+                        <div class="chall-dial-remote my-3 text-start">
+                            <h6 class="chall-dial-netcat-message">This is a remote challenge, connect via: </h6>
+                            <h6 class="chall-dial-netcat">
+                                <i class="bi bi-clipboard-fill chall-netcat-copy" style="cursor: pointer;"> nc {{ $chal.Host }} {{ $chal.Port }}</i>
+                            </h6>
+                        </div>
+                    {{ else if $chal.Host }}
+                        <a href="{{ $chal.Host }}"><i class="bi bi-link-45deg"></i><h6 class="my-3">{{ $chal.Host }}</h6></a>
+                    {{ end }}
+                    {{ if $chal.Hint1 }}
+                        <p class="mt-5 mb-3">&bull; {{ $chal.Hint1 }} </p>
+                    {{ end }}
+                    {{ if $chal.Hint2 }}
+                        <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
+                    {{ end }}
+                    {{ if not (index $solves $chal.Name) }}
+                        <form class="mb-4" action="/submit" method="POST">
+                            <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
+                                <input type="hidden" name="challID" value="{{ $chal.ID }}">
+                                <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
+                                <div class="input-group-append">
+                                    <button type="button" class="btn chall-submit">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    {{ else }}
+                        <h6 class="my-4"> Challenge already solved</h6>
+                    {{ end }}
+                    </div>
+            </div>
         {{ end }}
     {{ end }}
 {{ end }}
 
-<script>
-    $(".chall-preview").click(function(e) {
-        var modal = $("div." + e.currentTarget.name);
-        modal.removeClass("d-none");
-        var contents = modal.contents().find(".challenge-flag");
-        if(contents.length > 0) {
-            contents[0].focus();
-        }
-        e.preventDefault();
-    });
-
-    $(document).mouseup(function(e) {
-        var container = $("div.chall-toggle");
-
-        if (!container.is(e.target) && container.has(e.target).length === 0) {
-            container.addClass("d-none");
-        }
-    });
-</script>
+<!--Challenges tiling scripts-->
+<script src="/static/js/challenge.js"></script>
 
 {{ end }}

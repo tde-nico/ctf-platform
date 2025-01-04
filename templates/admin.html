@@ -4,16 +4,16 @@
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="challenges-tab" data-toggle="tab" href="#challenges" role="tab" aria-controls="challenges" aria-selected="true">Challenges</a>
+            <a class="nav-link active" id="challenges-tab" data-bs-toggle="tab" href="#challenges" role="tab" aria-controls="challenges" aria-selected="true">Challenges</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="submissions-tab" data-toggle="tab" href="#submissions" role="tab" aria-controls="submissions" aria-selected="false">Submissions</a>
+            <a class="nav-link" id="submissions-tab" data-bs-toggle="tab" href="#submissions" role="tab" aria-controls="submissions" aria-selected="false">Submissions</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Users</a>
+            <a class="nav-link" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Users</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="config-tab" data-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuration</a>
+            <a class="nav-link" id="config-tab" data-bs-toggle="tab" href="#config" role="tab" aria-controls="config" aria-selected="false">Configuration</a>
         </li>
     </ul>
 
@@ -26,22 +26,22 @@
 
                     <div>
                         <label for="challform-name">Name *</label>
-                        <input type="text" id="challform-name" name="name" required>
+                        <input type="text" class="form-control rounded w-50" id="challform-name" name="name" required>
                     </div>
 
                     <div>
                         <label for="challform-flag">Flag *</label>
-                        <input type="text" id="challform-flag" name="flag" required>
+                        <input type="text" class="form-control rounded w-50" id="challform-flag" name="flag" required>
                     </div>
 
                     <div class="multifield">
                         <div class="subfield">
                             <label for="challform-points">Points *</label>
-                            <input type="number" min="0" id="challform-points" name="points" value="500" required>
+                            <input type="number" class="form-control rounded w-50 h-50" min="0" id="challform-points" name="points" value="500" required>
                         </div>
                         <div class="subfield">
                             <label for="challform-category">Category *</label>
-                            <select name="category" required>
+                            <select class="form-control rounded w-50 h-20 selectpicker" name="category" required>
                                 <option value="" disabled selected="true">Select...</option>
                                 {{ range .Categories }}
                                     <option value="{{ . }}">{{ . }}</option>
@@ -50,7 +50,7 @@
                         </div>
                         <div class="subfield">
                             <label for="challform-difficulty">Difficulty *</label>
-                            <select name="difficulty" required>
+                            <select class="form-control rounded w-50 h-20 selectpicker" name="difficulty" required data-live-search="true">
                                 <option value="" disabled selected="true">Select...</option>
                                 {{ range .Difficulties }}
                                     <option value="{{ . }}">{{ . }}</option>
@@ -61,45 +61,45 @@
 
                     <div>
                         <label for="challform-desc">Description</label>
-                        <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is accepted!"></textarea>
+                        <textarea type="textarea" class="form-control rounded w-50 h-50" id="challform-desc" name="description" placeholder="HTML is accepted!"></textarea>
                     </div>
 
                     <div class="multifield">
                         <div class="subfield">
                             <label for="challform-hint1">Hint 1</label>
-                            <input type="text" id="challform-hint1" name="hint1">
+                            <input type="text" class="form-control rounded w-50" id="challform-hint1" name="hint1">
                         </div>
                         <div class="subfield">
                             <label for="challform-hint2">Hint 2</label>
-                            <input type="text"id="challform-hint2" name="hint2">
+                            <input type="text" class="form-control rounded w-50" id="challform-hint2" name="hint2">
                         </div>
                     </div>
 
                     <div class="multifield">
                         <div class="subfield">
                             <label for="challform-host">Host</label>
-                            <input type="text" id="challform-host" name="host">
+                            <input type="text" class="form-control rounded w-50" id="challform-host" name="host">
                         </div>
                         <div class="subfield">
                             <label for="challform-port">Port</label>
-                            <input type="number" min="0" max="65535" id="challform-port" name="port">
+                            <input type="number" class="form-control rounded w-25 h-50" min="0" max="65535" id="challform-port" name="port">
                         </div>
                     </div>
 
                     <div class="multifield">
                         <div class="subfield">
                             <label for="challform-files">Files (.zip)</label>
-                            <input type="file" id="challform-files" name="files">
+                            <input type="file" class="form-control rounded w-50 h-75" id="challform-files" name="files">
                         </div>
                         <div class="subfield">
                             <label for="challform-hidden">Hidden</label>
-                            <input type="checkbox" id="challform-hidden" name="is_hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
+                            <input type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
                         </div>
                     </div>
 
                     <div>
                         <label for="challform-extra">Extra</label>
-                        <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
+                        <input type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
                     </div>
 
                     <button type="submit" class="btn btn-primary mx-auto">Create challenge</button>
@@ -120,7 +120,7 @@
                 {{ range $i, $chal := $chals }}
 
                 <div class="card">
-                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-toggle="collapse" data-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ else if $chal.Hidden }} style="background-color: #cbcbcb" {{ end }}>
+                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-bs-toggle="collapse" data-bs-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ else if $chal.Hidden }} style="background-color: #cbcbcb" {{ end }}>
                         {{ .Name }} {{ if .Hidden }} <i class="fa fa-eye-slash" aria-hidden="true"></i> {{ end }} 
                     </div>
                     <div id="collapse-{{ .Category }}-{{ $i }}" class="collapse" aria-labelledby="heading-{{ .Category }}-{{ $i }}" data-parent="#challenges-accordion">
@@ -194,18 +194,18 @@
                                     </div>
                                     <div class="subfield">
                                         <label for="challform-hidden">Hidden</label>
-                                        <input type="checkbox" id="challform-hidden" name="is_hidden" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
+                                        <input type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
                                     </div>
                                 </div>
 
                                 <div>
                                     <label for="challform-extra">Extra</label>
-                                    <input type="checkbox" id="challform-extra" name="is_extra" data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .IsExtra }} checked {{ end }}>
+                                    <input type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .IsExtra }} checked {{ end }}>
                                 </div>
 
                                 <input type="hidden" name="id" value="{{ .ID }}">
                                 <button type="submit" class="btn btn-primary">Update challenge</button>
-                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletechalModal" data-name="{{ .Name }}">Delete challenge</button>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletechalModal" data-name="{{ .Name }}">Delete challenge</button>
                                 <!-- <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button> -->
                             </form>
                         </div>
@@ -231,7 +231,7 @@
                 <tbody class="my-5">
                     {{ range .Submissions }}
                     <tr class="table-hover" style="color:black">
-                        <td style="word-wrap: break-word;"><a href="/user/{{ .UserUsername }}" style="color: black;"> {{ .UserUsername }} </a></td>
+                        <td style="word-wrap: break-word;"><a href="/user/{{ .UserUsername }}" style="text-decoration: none;"> {{ .UserUsername }} </a></td>
                         <td style="word-wrap: break-word;">{{ .Flag }}</td>
                         <td>{{ .ChalName }}</td>
                         {{ if eq .Status "c" }}
@@ -267,7 +267,7 @@
                 <tbody class="my-5">
                     {{ range .Users }}
                     <tr>
-                        <td><a href="/user/{{ .Username }}" style="color: black;"> {{ .Username }} </a></td>
+                        <td><a href="/user/{{ .Username }}" style="text-decoration: none;"> {{ .Username }} </a></td>
                         <td>{{ .Email }}</td>
                         <td>{{ .Score }}</td>
                         {{ if .IsAdmin }}
@@ -279,7 +279,7 @@
                             <td></td>
                         {{ else }}
                         <td><button type="button" class="btn btn-outline-danger btn-sm float-right mr-3"
-                            data-toggle="modal" data-target="#resetpwModal" data-username="{{ .Username }}">Reset password</button>
+                            data-bs-toggle="modal" data-bs-target="#resetpwModal" data-bs-username="{{ .Username }}">Reset password</button>
                         </td>
                         {{ end }}
                     </tr>
@@ -298,7 +298,7 @@
                         {{ if eq .Type "bool" }}
                             <input type="checkbox" id="conf-{{ .Key }}" name="{{ .Key }}" value="{{ .Value }}"
                                 {{ if eq .Value "1" }} checked {{ end }}
-                                data-toggle="toggle" data-onstyle="primary" data-offstyle="secondary"
+                                data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary"
                                 onchange="this.value = this.checked ? '1' : '0';"
                             />
                         {{ else if eq .Type "int" }}
@@ -397,7 +397,7 @@
     });
 
     $(document).ready(function(){
-        $('a[data-toggle="tab"]').on('show.bs.tab', function(e) {
+        $('a[data-bs-toggle="tab"]').on('show.bs.tab', function(e) {
             localStorage.setItem('activeTab', $(e.target).attr('href'));
         });
         var activeTab = localStorage.getItem('activeTab');
