@@ -97,12 +97,12 @@
                         <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
                     {{ end }}
                     {{ if not (index $solves $chal.Name) }}
-                        <form class="mb-4" action="/submit" method="POST">
+                        <form class="mb-4 submit-form" action="/submit" method="POST">
                             <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
                                 <input type="hidden" name="challID" value="{{ $chal.ID }}">
                                 <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
                                 <div class="input-group-append">
-                                    <button type="button" class="btn chall-submit">Submit</button>
+                                    <button type="submit" class="btn chall-submit" name="{{ $chal.ID }}">Submit</button>
                                 </div>
                             </div>
                         </form>

@@ -4,10 +4,6 @@ function loginUser() {
 
     var username = usernameField.value;
     var password = passwordField.value;
-    var data = {
-        username: username,
-        password: password
-    };
     var formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
@@ -16,12 +12,12 @@ function loginUser() {
         method: "POST",
         body: formData
     })
-    .then(response => {
+    .then( response => {
         if (response.status == 200) {
-            window.location.href = "/";
+            window.location.href = "/challenges";
         }
         else {
-            alert("Invalid username or password");
+            window.location.reload();
         }
     })
     .catch(error => console.error("Error:", error));

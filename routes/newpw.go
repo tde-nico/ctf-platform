@@ -30,13 +30,6 @@ func newpw_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	err := r.ParseForm()
-	if err != nil {
-		log.Errorf("Error parsing form: %v", err)
-		http.Error(w, "Error parsing form", http.StatusBadRequest)
-		return
-	}
-
 	log.Infof("form: %+v", r.Form)
 
 	newpw := r.FormValue("password")
@@ -49,7 +42,7 @@ func newpw_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	err = db.ChangePassword(user.Username, newpw, false)
+	err := db.ChangePassword(user.Username, newpw, false)
 	if err != nil {
 		log.Errorf("Error changing password: %v", err)
 		addFlash(s, "Error changing password")

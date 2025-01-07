@@ -39,31 +39,65 @@ $(".chall-netcat-copy").click(function(e) {
     });
 });
 
-$(".chall-submit").click(function(e){
-    var correct = true;
-    var chall_name = $(e.currentTarget).parents().parents().siblings(".chall-dial-name").text().trim();
+$(".submit-form").submit(async function(e){
+    e.preventDefault();
+
+    e = $(e.currentTarget).find(".chall-submit");
+
+
+    var correct = false;
+
+    var flag = e.parents(".input-group-append").siblings(".chall-flag").val();
+    var chall_id = e.attr('name');
+
+    var formData = new FormData();
+    formData.append("flag", flag);
+    formData.append("challID", chall_id);
+    
+    var response = await fetch("/submit", {
+        method: "POST",
+        body: formData
+    });
+    
+
+    if (response.status == 202) {
+        //flag correct
+        correct = true;
+    }
+    else if (response.status == 409) {
+        correct = false;
+    }
+    else if (response.status == 406) {
+        correct = false;
+    }
+    else {
+        console.error("Error:", response);
+    }
+
+    var chall_name = e.parents().parents().siblings(".chall-dial-name").text().trim();
+
     if (correct){
         submitFlag(e.currentTarget);
-        $(e.currentTarget).parents(".chall-toggle").addClass("chall-toggle-solved");
-        $(e.currentTarget).prop('disabled', true);
-        $(e.currentTarget).parents(".input-group-append").siblings(".chall-flag").prop('disabled', true);
+        e.parents(".chall-toggle").addClass("chall-toggle-solved");
+        e.prop('disabled', true);
+        e.parents(".input-group-append").siblings(".chall-flag").prop('disabled', true);
         var button = $(".chall-preview").filter(function() {
             return $(this).find(".chall-title").text().trim() === chall_name;
         });
         button.addClass("chall-solved");
     }
     else {
-        $(e.currentTarget).parents(".chall-toggle").addClass("chall-toggle-wrong");
-        $(e.currentTarget).parents(".input-group-append").siblings(".chall-flag")
+        e.parents(".chall-toggle").addClass("chall-toggle-wrong");
+        e.parents(".input-group-append").siblings(".chall-flag")
             .addClass("text-danger")
             .css('outline', '1px solid red');
-        $(e.currentTarget).addClass("btn-danger");
+        e.addClass("btn-danger");
         setTimeout(function(){
-            $(e.currentTarget).parents(".chall-toggle").removeClass("chall-toggle-wrong");
-            $(e.currentTarget).parents(".input-group-append").siblings(".chall-flag")
+            e.parents(".chall-toggle").removeClass("chall-toggle-wrong");
+            e.parents(".input-group-append").siblings(".chall-flag")
                 .removeClass("text-danger")
                 .css('outline', 'none');
-            $(e.currentTarget).removeClass("btn-danger");
+            e.removeClass("btn-danger");
         },1000);
     }
 });
@@ -145,7 +179,6 @@ function startFireworks(){
 
 function challengeSolved(challId){
     startFireworks();
-    
 }
 
 document.addEventListener('DOMContentLoaded', function() {

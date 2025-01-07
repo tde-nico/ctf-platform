@@ -53,7 +53,7 @@ func login_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	if err != nil {
 		log.Errorf("Error logging in: %v", err)
 		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Error(w, "Bad username or password", http.StatusUnauthorized)
 		}
 		return
 	}
@@ -61,6 +61,6 @@ func login_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	s.Values["apikey"] = apiKey
 
 	if saveSession(w, r, s) {
-		http.Redirect(w, r, "/challenges", http.StatusSeeOther)
+		w.WriteHeader(http.StatusOK)
 	}
 }

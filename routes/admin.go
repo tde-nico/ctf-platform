@@ -152,16 +152,9 @@ func adminUpdateChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 }
 
 func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Errorf("Error parsing form: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	name := r.FormValue("name")
 	log.Infof("Delete Challenge: %s", name)
-	err = deleteChallenge(w, r, s, name)
+	err := deleteChallenge(w, r, s, name)
 	if err != nil {
 		return
 	}
@@ -173,13 +166,6 @@ func adminDeleteChall(w http.ResponseWriter, r *http.Request, s *sessions.Sessio
 }
 
 func adminResetPw(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Errorf("Error parsing form: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	username := r.FormValue("username")
 	password, err := db.ResetPassword(username)
 	if err != nil {
@@ -199,13 +185,6 @@ func adminResetPw(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 }
 
 func adminConfig(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Errorf("Error parsing form: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	configs, err := db.GetConfigs()
 	if err != nil {
 		log.Errorf("Error getting configs: %v", err)

@@ -17,12 +17,6 @@ type GraphPoint struct {
 }
 
 func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	err := r.ParseForm()
-	if err != nil {
-		log.Errorf("Error parsing form: %v", err)
-		http.Error(w, "Error parsing form", http.StatusBadRequest)
-		return
-	}
 	challID := r.FormValue("challID")
 	flag := strings.TrimSpace(r.FormValue("flag"))
 
@@ -30,14 +24,14 @@ func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	if user == nil {
 		addFlash(s, "You must be logged in to submit flags")
 		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		}
 		return
 	}
 
 	chalID, err := strconv.Atoi(challID)
 	if err != nil {
-		log.Errorf("Error converting chalID to int: %v", err)
+		log.Errorf("Error converting challID to int: %v", err)
 		http.Error(w, "Invalid challenge ID", http.StatusBadRequest)
 		return
 	}
@@ -49,17 +43,19 @@ func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
+	header := http.StatusOK
 	switch status {
 	case db.StatusCorrectFlag:
-		addFlash(s, "Correct flag :)", "success")
+		header = http.StatusAccepted
 	case db.StatusAlreadySolved:
+		header = http.StatusConflict
 		addFlash(s, "Challenge already solved", "warning")
 	case db.StatusWrongFlag:
-		addFlash(s, "Wrong flag :(")
+		header = http.StatusNotAcceptable
 	}
 
 	if saveSession(w, r, s) {
-		http.Redirect(w, r, "/challenges", http.StatusSeeOther)
+		w.WriteHeader(header)
 	}
 }
 
