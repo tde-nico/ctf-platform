@@ -11,5 +11,6 @@ WORKDIR /srv
 
 COPY --from=BUILDER /builder/platform /srv/
 COPY --from=BUILDER /builder/templates /srv/templates/
+COPY --from=BUILDER /builder/static /srv/static/
 
 ENTRYPOINT [ "./platform" ]
