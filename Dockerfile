@@ -10,5 +10,6 @@ FROM ubuntu:22.04
 WORKDIR /srv
 
 COPY --from=BUILDER /builder/platform /srv/
+COPY --from=BUILDER /builder/templates /srv/templates/
 
 ENTRYPOINT [ "./platform" ]
