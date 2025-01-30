@@ -47,7 +47,11 @@ func getSession(w http.ResponseWriter, r *http.Request) (*sessions.Session, bool
 	session, err := store.Get(r, "session")
 	if err != nil {
 		log.Errorf("Error getting session: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		addFlash(session, "Error getting session")
+		if saveSession(w, r, session) {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			// http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return nil, false
 	}
 	return session, true
@@ -115,7 +119,7 @@ func getFlashes(w http.ResponseWriter, r *http.Request, s *sessions.Session) []F
 	return flashes
 }
 
-func is_visible_category(chals []*db.Challenge) bool {
+func is_visible_category(chals []db.Challenge) bool {
 	for _, chal := range chals {
 		if !chal.Hidden {
 			return true
@@ -296,10 +300,14 @@ func isNewChallengeValid(chal *db.Challenge) error {
 	if err := isChallengeValid(chal); err != nil {
 		return err
 	}
-	if err := db.CheckChallengeExists(chal.Name); err != nil {
+	exists, err := db.ChallengeExistsName(chal.Name)
+	if err != nil {
 		return err
 	}
-	if err := db.CheckFlagExists(chal.Flag); err != nil {
+	if exists {
+		return fmt.Errorf("challenge already exists")
+	}
+	if err := db.FlagExists(chal.Flag); err != nil {
 		return err
 	}
 	return nil
@@ -341,7 +349,11 @@ func renameChallenge(chal *db.Challenge) error {
 		return nil
 	}
 
-	if db.CheckChallengeExists(chal.Name) != nil {
+	exists, err := db.ChallengeExistsName(chal.Name)
+	if err != nil {
+		return err
+	}
+	if exists {
 		return fmt.Errorf("can't rename, challenge already exists")
 	}
 

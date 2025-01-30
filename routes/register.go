@@ -25,12 +25,16 @@ func isUserDataValid(s *sessions.Session, username, email, password string) bool
 		return false
 	}
 
-	if db.UserExists(username) {
+	err := db.UserExists(username)
+	if err != nil {
+		log.Errorf("Error checking username: %v", err)
 		addFlash(s, "Username already taken")
 		return false
 	}
 
-	if db.EmailExists(email) {
+	err = db.EmailExists(email)
+	if err != nil {
+		log.Errorf("Error checking email: %v", err)
 		addFlash(s, "Email already taken")
 		return false
 	}
@@ -39,8 +43,13 @@ func isUserDataValid(s *sessions.Session, username, email, password string) bool
 }
 
 func isRegistrationAllowed(w http.ResponseWriter, r *http.Request, s *sessions.Session) bool {
-	allowed := db.GetConfig("registration-allowed")
-	if allowed == nil || *allowed == 0 {
+	allowed, err := db.GetConfig("registration-allowed")
+	if err != nil {
+		log.Errorf("Error getting registration-allowed config: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return false
+	}
+	if allowed == 0 {
 		addFlash(s, "Registration is disabled")
 		if saveSession(w, r, s) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)

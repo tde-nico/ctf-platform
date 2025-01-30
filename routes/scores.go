@@ -70,7 +70,7 @@ func scores(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	users, err := db.GetScoreUsers()
+	users, err := db.GetUsersScores()
 	if err != nil {
 		log.Errorf("Error getting users: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

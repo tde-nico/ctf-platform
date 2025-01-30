@@ -11,7 +11,7 @@ import (
 type DataUserInfo struct {
 	Data
 	UserProfile *db.User
-	Solves      []*db.Solve
+	Solves      []db.Solve
 }
 
 func userInfo(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
@@ -39,7 +39,7 @@ func userInfo(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		return
 	}
 
-	data.Solves, err = db.GetSolvesByUser(data.UserProfile)
+	data.Solves, err = db.GetUserSolves(data.UserProfile)
 	if err != nil {
 		log.Errorf("Error getting solves by user: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

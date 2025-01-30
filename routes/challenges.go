@@ -10,7 +10,7 @@ import (
 
 type DataChallenges struct {
 	Data
-	Challenges map[string][]*db.Challenge
+	Challenges map[string][]db.Challenge
 	Solves     map[string]bool
 }
 
@@ -23,7 +23,7 @@ func challenges(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	data := &DataChallenges{}
 	data.User = getSessionUser(s)
 
-	solves, err := db.GetSolvesByUser(data.User)
+	solves, err := db.GetUserSolves(data.User)
 	if err != nil {
 		log.Errorf("Error getting solves by user: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)

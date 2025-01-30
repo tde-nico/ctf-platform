@@ -11,12 +11,12 @@ import (
 
 type AdminPanelData struct {
 	Data
-	Users        []*db.User
+	Users        []db.User
 	Categories   []string
 	Difficulties []string
-	Challenges   map[string][]*db.Challenge
-	Submissions  []*db.Submission
-	Config       []*db.Config
+	Challenges   map[string][]db.Challenge
+	Submissions  []db.Submission
+	Config       []db.Config
 }
 
 func admin(w http.ResponseWriter, r *http.Request, s *sessions.Session) {

@@ -31,7 +31,6 @@ func main() {
 	db.InitDB("database.db")
 	defer db.CloseDB()
 
-	// Options
 	if flags.dev {
 		log.Notice("Dev mode enabled")
 	}
@@ -47,6 +46,7 @@ func main() {
 		db.PruneDB()
 		return
 	}
+	db.LoadStatements("db/statements.sql")
 
 	// Server
 	routes.StartRouting()
