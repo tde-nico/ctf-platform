@@ -3,3 +3,4 @@
 DEV
 platform
 *.db
+*.bak
