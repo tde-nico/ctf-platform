@@ -1,4 +1,22 @@
-rendere safe l'html delle descrizioni
-nuovo ruolo Spectator
-bottone per cambiare ruolo (maybe)
-batch update hidden challenges
+	
+
+Backend:
+	Priorità:
+		mettere la chiave dei cookie dinamica e non hardcodata
+		bot per i first blood
+		ottimizzare/aggiornare trigger sql (in particolare quello delle config)
+	rendere safe l'html delle descrizioni
+	nuovo ruolo Spectator
+	bottone per cambiare ruolo (maybe)
+	batch update hidden challenges
+
+Frontend:
+	mobile support (hamburger)
+	tick in devtools non al centro e di dimensione giusta
+	cambio font dei numeri
+	applicare il font ovunque
+	fixare l'end of page, tipo in config di /admin (non arriva correttamente in fondo)
+	togliere lo scomparire e riapparire della scheda della flag se la flag è sbagliata
+	cambiare i colori delle chall nascoste nella pagina delle chall
+	cambiare il colore delle chall nascoste e extra nell'admin page delle challenge
+
