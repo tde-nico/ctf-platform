@@ -1,11 +1,10 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"platform/db"
-	"platform/log"
-
-	"github.com/gorilla/sessions"
+	"platform/middleware"
 )
 
 type DataUserInfo struct {
@@ -14,37 +13,34 @@ type DataUserInfo struct {
 	Solves      []db.Solve
 }
 
-func userInfo(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	tmpl, err := getTemplate(w, "user")
-	if err != nil {
+func userInfo(ctx *middleware.Ctx) {
+	tmpl := getTemplate(ctx, "user")
+	if tmpl == nil {
 		return
 	}
 
 	data := &DataUserInfo{}
-	data.User = getSessionUser(s)
+	data.User = ctx.User
 
-	username := r.PathValue("username")
+	username := ctx.PathValue("username")
 	if username == "" {
-		addFlash(s, "Invalid username")
-		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		}
+		ctx.AddFlash("Invalid username")
+		ctx.Redirect("/", http.StatusSeeOther)
 		return
 	}
 
+	var err error
 	data.UserProfile, err = db.GetUserByUsername(username)
 	if err != nil {
-		log.Errorf("Error getting user by username: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting user by username: %v", err))
 		return
 	}
 
 	data.Solves, err = db.GetUserSolves(data.UserProfile)
 	if err != nil {
-		log.Errorf("Error getting solves by user: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting solves by user: %v", err))
 		return
 	}
 
-	executeTemplate(w, r, s, tmpl, data)
+	executeTemplate(ctx, tmpl, data)
 }

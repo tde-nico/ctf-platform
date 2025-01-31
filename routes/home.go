@@ -2,27 +2,22 @@ package routes
 
 import (
 	"net/http"
-
-	"github.com/gorilla/sessions"
+	"platform/middleware"
 )
 
-func home(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	tmpl, err := getTemplate(w, "home")
-	if err != nil {
+func home(ctx *middleware.Ctx) {
+	tmpl := getTemplate(ctx, "home")
+	if tmpl == nil {
 		return
 	}
 
-	if r.RequestURI != "/" {
-		addFlash(s, "404 Page not found")
-		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		}
+	if ctx.RequestURI != "/" {
+		ctx.AddFlash("404 Page not found")
+		ctx.Redirect("/", http.StatusSeeOther)
 		return
 	}
 
-	user := getSessionUser(s)
+	data := Data{User: ctx.User}
 
-	data := Data{User: user}
-
-	executeTemplate(w, r, s, tmpl, &data)
+	executeTemplate(ctx, tmpl, &data)
 }

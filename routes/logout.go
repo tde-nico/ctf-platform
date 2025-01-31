@@ -2,13 +2,10 @@ package routes
 
 import (
 	"net/http"
-
-	"github.com/gorilla/sessions"
+	"platform/middleware"
 )
 
-func logout(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	s.Options.MaxAge = -1
-	if saveSession(w, r, s) {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-	}
+func logout(ctx *middleware.Ctx) {
+	ctx.ExpireCookie()
+	ctx.Redirect("/login", http.StatusSeeOther)
 }

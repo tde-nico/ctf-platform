@@ -49,5 +49,5 @@ func main() {
 	db.LoadStatements("db/statements.sql")
 
 	// Server
-	routes.StartRouting()
+	routes.StartRouting([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
 }

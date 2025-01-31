@@ -139,7 +139,7 @@ SELECT id, username, email, score, is_admin
 	WHERE apikey = ?;
 
 -- GetUserByUsername
-SELECT id, email, score, is_admin
+SELECT id, username, email, score, is_admin
 	FROM users
 	WHERE username = ?;
 

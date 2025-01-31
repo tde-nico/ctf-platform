@@ -1,11 +1,9 @@
 package routes
 
 import (
-	"net/http"
+	"fmt"
 	"platform/db"
-	"platform/log"
-
-	"github.com/gorilla/sessions"
+	"platform/middleware"
 )
 
 type DataChallenges struct {
@@ -14,19 +12,18 @@ type DataChallenges struct {
 	Solves     map[string]bool
 }
 
-func challenges(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	tmpl, err := getTemplate(w, "challenges")
-	if err != nil {
+func challenges(ctx *middleware.Ctx) {
+	tmpl := getTemplate(ctx, "challenges")
+	if tmpl == nil {
 		return
 	}
 
 	data := &DataChallenges{}
-	data.User = getSessionUser(s)
+	data.User = ctx.User
 
 	solves, err := db.GetUserSolves(data.User)
 	if err != nil {
-		log.Errorf("Error getting solves by user: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting solves by user: %v", err))
 		return
 	}
 
@@ -37,12 +34,11 @@ func challenges(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 
 	data.Challenges, err = db.GetChallenges()
 	if err != nil {
-		log.Errorf("Error getting challenges: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting challenges: %v", err))
 		return
 	}
 
 	// TODO: make chals decscription HTML safe
 
-	executeTemplate(w, r, s, tmpl, data)
+	executeTemplate(ctx, tmpl, data)
 }

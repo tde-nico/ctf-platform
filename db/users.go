@@ -1,19 +1,13 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"platform/utils"
 )
 
-// TODO: collapse GetUserByAPIKey and GetUserByUsername into one function
-
-func GetUserByAPIKey(apiKey string) (*User, error) {
-	query, err := GetStatement("GetUserByAPIKey")
-	if err != nil {
-		return nil, fmt.Errorf("error getting statement: %v", err)
-	}
-
-	rows, err := query.Query(apiKey)
+func getUserByQuery(query *sql.Stmt, data string) (*User, error) {
+	rows, err := query.Query(data)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +17,7 @@ func GetUserByAPIKey(apiKey string) (*User, error) {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	user := User{ApiKey: apiKey}
+	user := User{}
 	err = rows.Scan(
 		&user.ID,
 		&user.Username,
@@ -38,34 +32,33 @@ func GetUserByAPIKey(apiKey string) (*User, error) {
 	return &user, nil
 }
 
+func GetUserByAPIKey(apiKey string) (*User, error) {
+	query, err := GetStatement("GetUserByAPIKey")
+	if err != nil {
+		return nil, fmt.Errorf("error getting statement: %v", err)
+	}
+
+	user, err := getUserByQuery(query, apiKey)
+	if err != nil {
+		return nil, err
+	}
+
+	user.ApiKey = apiKey
+	return user, nil
+}
+
 func GetUserByUsername(username string) (*User, error) {
 	query, err := GetStatement("GetUserByUsername")
 	if err != nil {
 		return nil, fmt.Errorf("error getting statement: %v", err)
 	}
 
-	rows, err := query.Query(username)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return nil, fmt.Errorf("user not found")
-	}
-
-	user := User{Username: username}
-	err = rows.Scan(
-		&user.ID,
-		&user.Email,
-		&user.Score,
-		&user.IsAdmin,
-	)
+	user, err := getUserByQuery(query, username)
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func GetUsers() ([]User, error) {

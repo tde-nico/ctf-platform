@@ -4,58 +4,44 @@ import (
 	"net/http"
 	"platform/db"
 	"platform/log"
-
-	"github.com/gorilla/sessions"
+	"platform/middleware"
 )
 
-func newpw_get(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	tmpl, err := getTemplate(w, "newpw")
-	if err != nil {
+func newpw_get(ctx *middleware.Ctx) {
+	tmpl := getTemplate(ctx, "newpw")
+	if tmpl == nil {
 		return
 	}
-	user := getSessionUser(s)
 
-	data := Data{User: user}
-
-	executeTemplate(w, r, s, tmpl, &data)
+	data := Data{User: ctx.User}
+	executeTemplate(ctx, tmpl, &data)
 }
 
-func newpw_post(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	user := getSessionUser(s)
-	if user == nil {
-		addFlash(s, "You must be logged in to access that page")
-		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		}
+func newpw_post(ctx *middleware.Ctx) {
+	if ctx.User == nil {
+		ctx.AddFlash("You must be logged in to access that page")
+		ctx.Redirect("/", http.StatusSeeOther)
 		return
 	}
 
-	log.Infof("form: %+v", r.Form)
-
-	newpw := r.FormValue("password")
+	newpw := ctx.FormValue("password")
 
 	if len(newpw) < MAX_PASSWORD_LENGTH {
-		addFlash(s, "Password is too short")
-		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/newpw", http.StatusSeeOther)
-		}
+		ctx.AddFlash("Password is too short")
+		ctx.Redirect("/newpw", http.StatusSeeOther)
 		return
 	}
 
-	err := db.ChangePassword(user.Username, newpw, false)
+	err := db.ChangePassword(ctx.User.Username, newpw, false)
 	if err != nil {
 		log.Errorf("Error changing password: %v", err)
-		addFlash(s, "Error changing password")
-		if saveSession(w, r, s) {
-			http.Redirect(w, r, "/newpw", http.StatusSeeOther)
-		}
+		ctx.AddFlash("Error changing password")
+		ctx.Redirect("/newpw", http.StatusSeeOther)
 		return
 	}
 
-	s.Values["apikey"] = ""
+	ctx.SetSessionValue("apikey", "")
 
-	addFlash(s, "Password changed successfully", "success")
-	if saveSession(w, r, s) {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
+	ctx.AddFlash("Password changed successfully", "success")
+	ctx.Redirect("/", http.StatusSeeOther)
 }

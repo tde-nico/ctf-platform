@@ -9,42 +9,42 @@ const APIKEY_LENGTH = 32
 const SALT_LENGTH = 8
 const INVALID_PREFIX = "INVALID_"
 
-func UserExists(username string) error {
+func UserExists(username string) (bool, error) {
 	query, err := GetStatement("UserExists")
 	if err != nil {
-		return fmt.Errorf("error getting statement: %v", err)
+		return false, fmt.Errorf("error getting statement: %v", err)
 	}
 
 	rows, err := query.Query(username)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return fmt.Errorf("user not found")
+		return false, nil
 	}
 
-	return nil
+	return true, nil
 }
 
-func EmailExists(email string) error {
+func EmailExists(email string) (bool, error) {
 	query, err := GetStatement("EmailExists")
 	if err != nil {
-		return fmt.Errorf("error getting statement: %v", err)
+		return false, fmt.Errorf("error getting statement: %v", err)
 	}
 
 	rows, err := query.Query(email)
 	if err != nil {
-		return err
+		return false, err
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return fmt.Errorf("email not found")
+		return false, nil
 	}
 
-	return nil
+	return true, nil
 }
 
 func updatePassword(username, salt, secret, apiKey string) error {
@@ -79,9 +79,12 @@ func ChangePassword(username, password string, invalid bool) error {
 }
 
 func ResetPassword(username string) (string, error) {
-	err := UserExists(username)
+	exists, err := UserExists(username)
 	if err != nil {
 		return "", err
+	}
+	if !exists {
+		return "", fmt.Errorf("user not found")
 	}
 
 	_, password, err := utils.GetRand(SALT_LENGTH)

@@ -2,13 +2,12 @@ package routes
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"platform/db"
-	"platform/log"
+	"platform/middleware"
 	"strconv"
 	"strings"
-
-	"github.com/gorilla/sessions"
 )
 
 type GraphPoint struct {
@@ -16,30 +15,30 @@ type GraphPoint struct {
 	Y int    `json:"y"`
 }
 
-func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	challID := r.FormValue("challID")
-	flag := strings.TrimSpace(r.FormValue("flag"))
+type ScoresData struct {
+	Data
+	Users []db.UserScore
+}
 
-	user := getSessionUser(s)
-	if user == nil {
-		addFlash(s, "You must be logged in to submit flags")
-		if saveSession(w, r, s) {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		}
+func submit(ctx *middleware.Ctx) {
+	challID := ctx.FormValue("challID")
+	flag := strings.TrimSpace(ctx.FormValue("flag"))
+
+	if ctx.User == nil {
+		ctx.AddFlash("You must be logged in to submit flags")
+		ctx.Error("Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	chalID, err := strconv.Atoi(challID)
 	if err != nil {
-		log.Errorf("Error converting challID to int: %v", err)
-		http.Error(w, "Invalid challenge ID", http.StatusBadRequest)
+		ctx.InternalError(fmt.Errorf("error converting challID to int: %v", err))
 		return
 	}
 
-	status, err := db.SubmitFlag(user, chalID, flag)
+	status, err := db.SubmitFlag(ctx.User, chalID, flag)
 	if err != nil {
-		log.Errorf("Error submitting flag: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error submitting flag: %v", err))
 		return
 	}
 
@@ -49,46 +48,37 @@ func submit(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		header = http.StatusAccepted
 	case db.StatusAlreadySolved:
 		header = http.StatusConflict
-		addFlash(s, "Challenge already solved", "warning")
+		ctx.AddFlash("Challenge already solved", "warning")
 	case db.StatusWrongFlag:
 		header = http.StatusNotAcceptable
 	}
 
-	if saveSession(w, r, s) {
-		w.WriteHeader(header)
-	}
+	ctx.WriteHeader(header)
 }
 
-type ScoresData struct {
-	Data
-	Users []db.UserScore
-}
-
-func scores(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
-	tmpl, err := getTemplate(w, "scores")
-	if err != nil {
+func scores(ctx *middleware.Ctx) {
+	tmpl := getTemplate(ctx, "scores")
+	if tmpl == nil {
 		return
 	}
 
 	users, err := db.GetUsersScores()
 	if err != nil {
-		log.Errorf("Error getting users: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting users: %v", err))
 		return
 	}
 
 	data := ScoresData{Data: Data{}}
 	data.Users = users
-	data.User = getSessionUser(s)
+	data.User = ctx.User
 
-	executeTemplate(w, r, s, tmpl, &data)
+	executeTemplate(ctx, tmpl, &data)
 }
 
-func graphData(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
+func graphData(ctx *middleware.Ctx) {
 	data, err := db.GetGraphData()
 	if err != nil {
-		log.Errorf("Error getting graph data: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error getting graph data: %v", err))
 		return
 	}
 
@@ -108,11 +98,10 @@ func graphData(w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 		jsonData[d.User] = append(jsonData[d.User], point)
 	}
 
-	j, err := json.Marshal(jsonData)
+	response, err := json.Marshal(jsonData)
 	if err != nil {
-		log.Errorf("Error marshaling json: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		ctx.InternalError(fmt.Errorf("error marshaling json: %v", err))
 		return
 	}
-	w.Write(j)
+	ctx.Write(response)
 }
