@@ -4,7 +4,7 @@ tmp_dir = ".tmp"
 [build]
   args_bin = []
   bin = "./.tmp/platform"
-  cmd = "go build -tags 'sqlite_math_functions' -o .tmp/platform ."
+  cmd = "go build -o .tmp/platform ."
   delay = 1000
   exclude_dir = ["files", "infra", "static", "templates"]
   exclude_file = []

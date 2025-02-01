@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"crypto/sha256"
 	"fmt"
+	"html/template"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"text/template"
 )
 
 type Data struct {

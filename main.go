@@ -10,15 +10,17 @@ import (
 )
 
 type Flags struct {
-	migrate bool
-	clean   bool
-	prune   bool
-	dev     bool
+	migrate  bool
+	triggers bool
+	clean    bool
+	prune    bool
+	dev      bool
 }
 
 func InitFlags() *Flags {
 	var flags Flags
 	flag.BoolVar(&flags.migrate, "m", false, "Migrate the database")
+	flag.BoolVar(&flags.triggers, "t", false, "Reload Triggers")
 	flag.BoolVar(&flags.clean, "c", false, "Clean the userland database (non admin users, solves, submissions)")
 	flag.BoolVar(&flags.prune, "p", false, "Clean ALL the database")
 	flag.BoolVar(&flags.dev, "d", false, "Enables Dev Mode")
@@ -37,15 +39,16 @@ func EvalFlags(flags *Flags) bool {
 		db.DropTables()
 		db.ExecSQLFile("db/schema.sql")
 		db.ExecSQLFile("db/triggers.sql")
-		return false
+	} else if flags.triggers {
+		db.ExecSQLFile("db/triggers.sql")
 	} else if flags.clean {
 		db.CleanDB()
-		return false
 	} else if flags.prune {
 		db.PruneDB()
-		return false
+	} else {
+		return true
 	}
-	return true
+	return false
 }
 
 func LoadSecretKey() []byte {

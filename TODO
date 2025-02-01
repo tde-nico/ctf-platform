@@ -1,10 +1,11 @@
-	
+
 Backend:
 	Priorità:
 		bot per i first blood
-		ottimizzare/aggiornare trigger sql (in particolare quello delle config)
-	rendere safe l'html delle descrizioni (da controllare se di default)
+	mettere la secret key nel db
 	nuovo ruolo Spectator
+	creare categorie nel db
+	creare badge nel db con corrispettivi trigger
 
 Frontend:
 	mobile support (hamburger)
