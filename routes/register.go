@@ -106,5 +106,5 @@ func register_post(ctx *middleware.Ctx) {
 	}
 
 	ctx.AddFlash("Registration Completed", "success")
-	ctx.Redirect("/login", http.StatusSeeOther)
+	ctx.Redirect("/", http.StatusSeeOther)
 }

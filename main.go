@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"flag"
 	"os"
 	"platform/db"
@@ -15,8 +16,7 @@ type Flags struct {
 	dev     bool
 }
 
-func main() {
-	// Flags
+func InitFlags() *Flags {
 	var flags Flags
 	flag.BoolVar(&flags.migrate, "m", false, "Migrate the database")
 	flag.BoolVar(&flags.clean, "c", false, "Clean the userland database (non admin users, solves, submissions)")
@@ -26,11 +26,10 @@ func main() {
 	if _, err := os.Stat("DEV"); err == nil || os.Getenv("DEV") != "" {
 		flags.dev = true
 	}
+	return &flags
+}
 
-	// DB
-	db.InitDB("database.db")
-	defer db.CloseDB()
-
+func EvalFlags(flags *Flags) bool {
 	if flags.dev {
 		log.Notice("Dev mode enabled")
 	}
@@ -38,16 +37,49 @@ func main() {
 		db.DropTables()
 		db.ExecSQLFile("db/schema.sql")
 		db.ExecSQLFile("db/triggers.sql")
-		return
+		return false
 	} else if flags.clean {
 		db.CleanDB()
-		return
+		return false
 	} else if flags.prune {
 		db.PruneDB()
+		return false
+	}
+	return true
+}
+
+func LoadSecretKey() []byte {
+	secretHex, ok := os.LookupEnv("SECRET_KEY")
+	if !ok {
+		log.Fatal("SECRET_KEY not found")
+	}
+
+	if len(secretHex) != 64 {
+		log.Fatal("SECRET_KEY must be 32 bytes long")
+	}
+
+	secret := make([]byte, 32)
+	n, err := hex.Decode(secret, []byte(secretHex))
+	if err != nil {
+		log.Fatal("Error decoding SECRET_KEY: %v", err)
+	}
+	if n != 32 {
+		log.Fatal("Error decoding SECRET_KEY")
+	}
+
+	return secret
+}
+
+func main() {
+	flags := InitFlags()
+
+	db.InitDB("database.db")
+	defer db.CloseDB()
+	if !EvalFlags(flags) {
 		return
 	}
 	db.LoadStatements("db/statements.sql")
 
-	// Server
-	routes.StartRouting([]byte("GrazieDarioGrazieDarioGrazieDP_1"))
+	key := LoadSecretKey()
+	routes.StartRouting(key)
 }

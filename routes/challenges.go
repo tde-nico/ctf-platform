@@ -4,11 +4,18 @@ import (
 	"fmt"
 	"platform/db"
 	"platform/middleware"
+	"sort"
 )
+
+type CategoryChallenges struct {
+	Category   string
+	Challenges []db.Challenge
+}
 
 type DataChallenges struct {
 	Data
-	Challenges map[string][]db.Challenge
+	// Challenges map[string][]db.Challenge
+	Challenges []CategoryChallenges
 	Solves     map[string]bool
 }
 
@@ -32,13 +39,27 @@ func challenges(ctx *middleware.Ctx) {
 		data.Solves[solve.ChalName] = true
 	}
 
-	data.Challenges, err = db.GetChallenges()
+	challenges, err := db.GetChallenges()
 	if err != nil {
 		ctx.InternalError(fmt.Errorf("error getting challenges: %v", err))
 		return
 	}
 
-	// TODO: make chals decscription HTML safe
+	for cat, chall := range challenges {
+		data.Challenges = append(data.Challenges, CategoryChallenges{
+			Category:   cat,
+			Challenges: chall,
+		})
+	}
+
+	sort.Slice(data.Challenges, func(i, j int) bool {
+		if data.Challenges[i].Category == "Intro" {
+			return true
+		} else if data.Challenges[j].Category == "Intro" {
+			return false
+		}
+		return data.Challenges[i].Category < data.Challenges[j].Category
+	})
 
 	executeTemplate(ctx, tmpl, data)
 }

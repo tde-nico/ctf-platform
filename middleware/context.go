@@ -12,12 +12,11 @@ import (
 )
 
 type Ctx struct {
-	Writer        http.ResponseWriter
-	request       *http.Request
-	session       *sessions.Session
-	User          *db.User
-	RequestURI    string
-	MultipartForm *multipart.Form
+	Writer     http.ResponseWriter
+	request    *http.Request
+	session    *sessions.Session
+	User       *db.User
+	RequestURI string
 }
 
 type Flash struct {
@@ -39,7 +38,6 @@ func (c *Ctx) Init(w http.ResponseWriter, r *http.Request) error {
 	c.Writer = w
 	c.request = r
 	c.RequestURI = r.RequestURI
-	c.MultipartForm = r.MultipartForm
 
 	session, err := store.Get(r, "session")
 	c.session = session
@@ -67,13 +65,11 @@ func (c *Ctx) Redirect(url string, code int) {
 		c.InternalError(fmt.Errorf("error saving session when redirecting: %v", err))
 	}
 	http.Redirect(c.Writer, c.request, url, code)
-	// runtime.Goexit()
 }
 
 func (c *Ctx) InternalError(err error) {
 	log.Errorf("%v", err)
 	http.Error(c.Writer, "Internal Server Error", http.StatusInternalServerError)
-	// runtime.Goexit()
 }
 
 func (c *Ctx) Error(msg string, code int) {
@@ -82,7 +78,6 @@ func (c *Ctx) Error(msg string, code int) {
 		c.InternalError(fmt.Errorf("error saving session when throwing error: %v", err))
 	}
 	http.Error(c.Writer, msg, code)
-	// runtime.Goexit()
 }
 
 func (c *Ctx) WriteHeader(code int) {
@@ -91,7 +86,6 @@ func (c *Ctx) WriteHeader(code int) {
 		c.InternalError(fmt.Errorf("error saving session when writing header: %v", err))
 	}
 	c.Writer.WriteHeader(code)
-	// runtime.Goexit()
 }
 
 func (c *Ctx) Write(data []byte) {
@@ -191,6 +185,10 @@ func (c *Ctx) ParseMultipartForm() {
 	if err != nil {
 		c.InternalError(fmt.Errorf("error parsing multipart form: %v", err))
 	}
+}
+
+func (c *Ctx) MultipartForm() *multipart.Form {
+	return c.request.MultipartForm
 }
 
 func (c *Ctx) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {

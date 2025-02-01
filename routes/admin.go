@@ -66,7 +66,7 @@ func adminNewChall(ctx *middleware.Ctx) {
 		return
 	}
 
-	if len(ctx.MultipartForm.File) > 0 {
+	if len(ctx.MultipartForm().File) > 0 {
 		if !extractChallengeFiles(ctx, chal) {
 			return
 		}
@@ -98,7 +98,7 @@ func adminUpdateChall(ctx *middleware.Ctx) {
 		return
 	}
 
-	if len(ctx.MultipartForm.File) > 0 {
+	if len(ctx.MultipartForm().File) > 0 {
 		err = deleteChallengeFiles(chal.Name)
 		if err != nil {
 			log.Errorf("Error deleting challenge files: %s: %v", chal.Name, err)
@@ -138,6 +138,7 @@ func adminDeleteChall(ctx *middleware.Ctx) {
 
 func adminResetPw(ctx *middleware.Ctx) {
 	username := ctx.FormValue("username")
+	log.Warningf("Reset Password Username: %s", username) //! FIX: username empty
 	password, err := db.ResetPassword(username)
 	if err != nil {
 		log.Errorf("Error resetting password: %v", err)

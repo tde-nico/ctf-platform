@@ -1,22 +1,28 @@
 	
-
 Backend:
 	Priorità:
-		mettere la chiave dei cookie dinamica e non hardcodata
 		bot per i first blood
 		ottimizzare/aggiornare trigger sql (in particolare quello delle config)
-	rendere safe l'html delle descrizioni
+	rendere safe l'html delle descrizioni (da controllare se di default)
 	nuovo ruolo Spectator
-	bottone per cambiare ruolo (maybe)
-	batch update hidden challenges
 
 Frontend:
 	mobile support (hamburger)
-	tick in devtools non al centro e di dimensione giusta
+	check box in devtools non al centro e di dimensione giusta
+	dare uno stile alle check box
 	cambio font dei numeri
 	applicare il font ovunque
 	fixare l'end of page, tipo in config di /admin (non arriva correttamente in fondo)
 	togliere lo scomparire e riapparire della scheda della flag se la flag è sbagliata
 	cambiare i colori delle chall nascoste nella pagina delle chall
 	cambiare il colore delle chall nascoste e extra nell'admin page delle challenge
+	rimuovere lo spazio vuoto che si crea sotto i flash quando presenti
+	forse: spostare la X dei flash a destra e dargli uno stile
+	fixare la X del resetpassword dal pannello admin
 
+
+Entambi:
+	consolidare register e login (rimovere il route GET di login?) (per ora /register punta a "/" se non errori)
+	fixare resetpassword dal pannello admin (il campo username arriva vuoto dal form)
+	batch update hidden challenges
+	bottone per cambiare ruolo (maybe)

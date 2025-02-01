@@ -6,39 +6,45 @@
 
 {{ $user := .User }}
 {{ $solves := .Solves }}
-{{ range $cat, $chals := .Challenges }} {{ if or ($chals | is_visible_category) $user.IsAdmin }}
-    {{ if eq $cat "Crypto" }}
-        <h3 class="text-center"> {{ $cat }} <i class="bi bi-unlock-fill"></i> </h3>
-    {{ else if eq $cat "Web" }}
-        <h3 class="text-center"> {{ $cat }} <i class="bi bi-browser-safari"></i> </h3>
-    {{ else if eq $cat "Reverse" }}
-        <h3 class="text-center"> {{ $cat }} <i class="bi bi-wrench-adjustable"></i> </h3>
-    {{ else if eq $cat "Pwn" }}
-        <h3 class="text-center"> {{ $cat }} <i class="bi bi-file-earmark-binary-fill"></i> </h3>
-    {{ else if eq $cat "Intro" }}
-        <h3 class="text-center"> {{ $cat }} <i class="bi bi-play-fill"></i> </h3>
-    {{ else }}
-        <h3 class="text-center"> {{ $cat }} </h3>
-    {{ end }}
-
-    <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
-        {{ range $i, $chal :=  $chals }}
-            {{ if or (not $chal.Hidden) $user.IsAdmin }}
-            <div class="chall-box grid-item">
-                    <button class="btn chall-preview{{ if $chal.Hidden }} chall-hidden {{ else if (index $solves $chal.Name) }}  chall-solved {{ end }} w-100 h-100 chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }} " name="{{ $chal.ID }}">
-                        <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
-                        <div class="chall-footer">
-                            <h5 class="chall-points">{{ $chal.Points }}pt</h5>
-                        </div>
-                    </button>
-            </div>
-            {{ end }}
+{{ range $_, $chalsData := .Challenges }} 
+    {{ $cat := $chalsData.Category }}
+    {{ $chals := $chalsData.Challenges }}
+    {{ if or ($chals | is_visible_category) $user.IsAdmin }}
+        {{ if eq $cat "Crypto" }}
+            <h3 class="text-center"> {{ $cat }} <i class="bi bi-unlock-fill"></i> </h3>
+        {{ else if eq $cat "Web" }}
+            <h3 class="text-center"> {{ $cat }} <i class="bi bi-browser-safari"></i> </h3>
+        {{ else if eq $cat "Reverse" }}
+            <h3 class="text-center"> {{ $cat }} <i class="bi bi-wrench-adjustable"></i> </h3>
+        {{ else if eq $cat "Pwn" }}
+            <h3 class="text-center"> {{ $cat }} <i class="bi bi-file-earmark-binary-fill"></i> </h3>
+        {{ else if eq $cat "Intro" }}
+            <h3 class="text-center"> {{ $cat }} <i class="bi bi-play-fill"></i> </h3>
+        {{ else }}
+            <h3 class="text-center"> {{ $cat }} </h3>
         {{ end }}
-    </div>
-{{ end }} {{ end }}
+
+        <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
+            {{ range $i, $chal :=  $chals }}
+                {{ if or (not $chal.Hidden) $user.IsAdmin }}
+                <div class="chall-box grid-item">
+                        <button class="btn chall-preview{{ if $chal.Hidden }} chall-hidden {{ else if (index $solves $chal.Name) }}  chall-solved {{ end }} w-100 h-100 chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }} " name="{{ $chal.ID }}">
+                            <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
+                            <div class="chall-footer">
+                                <h5 class="chall-points">{{ $chal.Points }}pt</h5>
+                            </div>
+                        </button>
+                </div>
+                {{ end }}
+            {{ end }}
+        </div>
+    {{ end }}
+{{ end }}
 
 <div id="overlay" class="overlay"></div>
-{{ range $cat, $chals := .Challenges }}
+{{ range $_, $chalsData := .Challenges }} 
+    {{ $cat := $chalsData.Category }}
+    {{ $chals := $chalsData.Challenges }}
     {{ range $chal := $chals }}
         {{ if or (not $chal.Hidden) $user.IsAdmin }}
             <div class="d-none {{ $chal.ID }} chall-toggle position-fixed chall-toggle-{{ $chal.Difficulty }} {{ if (index $solves $chal.Name) }} chall-toggle-solved {{ end }}">
