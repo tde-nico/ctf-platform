@@ -18,6 +18,9 @@ Frontend:
 	forse: spostare la X dei flash a destra e dargli uno stile
 	fixare la X del resetpassword dal pannello admin
 
+	templ ?
+	htmx ?
+
 
 Entambi:
 	consolidare login (rimovere il route GET di login?)

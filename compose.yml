@@ -3,8 +3,6 @@ services:
   platform:
     build: .
     restart: unless-stopped
-    environment:
-      SECRET_KEY: $SECRET_KEY
     ports:
       - 8888:8888
     volumes:

@@ -7,6 +7,10 @@ RUN go mod download && \
 
 FROM ubuntu:22.04
 
+RUN apt update && \
+	apt upgrade -y && \
+	apt install -y ca-certificates
+
 WORKDIR /srv
 
 COPY --from=builder /builder/platform /srv/
