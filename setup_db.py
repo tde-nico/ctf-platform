@@ -26,7 +26,7 @@ configs = [
 	}, {
 		'key': 'telegram-bot-chat',
 		'type': 'text',
-		'value': '-1002063529237',
+		'value': '',
 		'desc': 'Telegram chat ID',
 	}
 ]

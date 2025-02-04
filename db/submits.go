@@ -112,20 +112,26 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 	}
 
 	if chal.Solves == 0 && !user.IsAdmin {
-		token, err := GetKey("telegram-key")
+		enable, err := GetConfig("telegram-bot-enable")
 		if err != nil {
-			return StatusWrongFlag, fmt.Errorf("error getting telegram key: %v", err)
+			return StatusWrongFlag, fmt.Errorf("error getting telegram enable: %v", err)
 		}
+		if enable == 1 {
+			token, err := GetKey("telegram-key")
+			if err != nil {
+				return StatusWrongFlag, fmt.Errorf("error getting telegram key: %v", err)
+			}
 
-		id, err := GetConfig("telegram-bot-chat")
-		if err != nil {
-			return StatusWrongFlag, fmt.Errorf("error getting telegram chat id: %v", err)
-		}
+			id, err := GetConfig("telegram-bot-chat")
+			if err != nil {
+				return StatusWrongFlag, fmt.Errorf("error getting telegram chat id: %v", err)
+			}
 
-		log.Noticef("First Blood on %s from %s", chal.Name, user.Username)
-		err = telegram_bot.SendTelegramMsg(token, int64(id), chal.Name, user.Username)
-		if err != nil {
-			log.Error(err)
+			log.Noticef("First Blood on %s from %s", chal.Name, user.Username)
+			err = telegram_bot.SendTelegramMsg(token, int64(id), chal.Name, user.Username)
+			if err != nil {
+				log.Error(err)
+			}
 		}
 	}
 

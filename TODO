@@ -2,7 +2,8 @@
 Backend:
 	creare categorie nel db
 	creare badge nel db con corrispettivi trigger
-	nuovo ruolo Spectator
+	new features:
+		nuovo ruolo Spectator
 
 Frontend:
 	mobile support (hamburger)
@@ -19,6 +20,7 @@ Frontend:
 	fixare la X del resetpassword dal pannello admin
 
 	templ ?
+	alpine.js ?
 	htmx ?
 
 
