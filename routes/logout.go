@@ -7,5 +7,5 @@ import (
 
 func logout(ctx *middleware.Ctx) {
 	ctx.ExpireCookie()
-	ctx.Redirect("/login", http.StatusSeeOther)
+	ctx.Redirect("/", http.StatusSeeOther)
 }

@@ -12,6 +12,11 @@ UPDATE config
 	SET value = ?
 	WHERE key = ?;
 
+-- GetKey
+SELECT key
+	FROM keys
+	WHERE name = ?;
+
 -- ChallengeExistsID
 SELECT name
 	FROM challenges

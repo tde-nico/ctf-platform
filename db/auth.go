@@ -140,7 +140,7 @@ func LoginUser(username, password string) (string, error) {
 	defer rows.Close()
 
 	if !rows.Next() {
-		return "", fmt.Errorf("user not found")
+		return "", fmt.Errorf("user \"%s\" not found", username)
 	}
 
 	var apikey, saltHex, secretHex string

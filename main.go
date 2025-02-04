@@ -52,9 +52,15 @@ func EvalFlags(flags *Flags) bool {
 }
 
 func LoadSecretKey() []byte {
+	var err error
+
 	secretHex, ok := os.LookupEnv("SECRET_KEY")
 	if !ok {
-		log.Fatal("SECRET_KEY not found")
+		log.Info("SECRET_KEY not found in environment, using database")
+		secretHex, err = db.GetKey("secret-key")
+		if err != nil {
+			log.Fatal("SECRET_KEY not found: %v", err)
+		}
 	}
 
 	if len(secretHex) != 64 {

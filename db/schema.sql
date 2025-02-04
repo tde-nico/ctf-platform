@@ -58,3 +58,9 @@ CREATE TABLE IF NOT EXISTS "submissions" (
 	FOREIGN KEY("userid") REFERENCES "users"("id"),
 	PRIMARY KEY("id")
 );
+
+CREATE TABLE IF NOT EXISTS "keys" (
+	"name" TEXT NOT NULL,
+	"key" TEXT UNIQUE NOT NULL,
+	PRIMARY KEY("name")
+);
