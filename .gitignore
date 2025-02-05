@@ -1,7 +1,9 @@
 .tmp
+files/
 
 DEV
 platform
 *.db
 *.bak
 .env
+.DS_Store

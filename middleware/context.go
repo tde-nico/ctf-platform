@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"platform/db"
 	"platform/log"
 	"strings"
@@ -17,6 +18,7 @@ type Ctx struct {
 	session    *sessions.Session
 	User       *db.User
 	RequestURI string
+	URL        *url.URL
 }
 
 type Flash struct {
@@ -38,6 +40,7 @@ func (c *Ctx) Init(w http.ResponseWriter, r *http.Request) error {
 	c.Writer = w
 	c.request = r
 	c.RequestURI = r.RequestURI
+	c.URL = r.URL
 
 	session, err := store.Get(r, "session")
 	c.session = session
@@ -193,4 +196,12 @@ func (c *Ctx) MultipartForm() *multipart.Form {
 
 func (c *Ctx) FormFile(key string) (multipart.File, *multipart.FileHeader, error) {
 	return c.request.FormFile(key)
+}
+
+func (c *Ctx) SetHeader(key, value string) {
+	c.Writer.Header().Set(key, value)
+}
+
+func (c *Ctx) ServeFile(path string) {
+	http.ServeFile(c.Writer, c.request, path)
 }

@@ -12,8 +12,7 @@ func StartRouting(key []byte) {
 	static := http.FileServer(http.Dir("static"))
 	http.Handle("GET /static/", http.StripPrefix("/static/", static))
 
-	files := http.FileServer(http.Dir("files"))
-	http.Handle("GET /files/", http.StripPrefix("/files/", files))
+	middleware.HandleFunc("GET /files/", download)
 
 	middleware.HandleFunc("GET /", home)
 	middleware.HandleFunc("GET /register", register_get)
