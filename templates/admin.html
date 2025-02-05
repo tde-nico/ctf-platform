@@ -1,5 +1,9 @@
 {{define "content"}}
 
+<div class="my-5 text-center">
+    <h2 class="pixelated-title">Admin pane</h2>
+</div>
+
 <div class="container">
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -21,36 +25,39 @@
 
         <div class="tab-pane show active" id="challenges" role="tabpanel" aria-labelledby="challenges-tab">
             <div class="mt-3">
-                <form class="challform mx-auto" action="/admin/newchal" method="POST" enctype="multipart/form-data">
-                    <h5>New challenge</h5>
+                <h5>New challenge</h5>
+                <form class="challform" action="/admin/newchal" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="d-flex">
 
-                    <div>
-                        <label for="challform-name">Name *</label>
-                        <input type="text" class="form-control rounded w-50" id="challform-name" name="name" required>
-                    </div>
-
-                    <div>
-                        <label for="challform-flag">Flag *</label>
-                        <input type="text" class="form-control rounded w-50" id="challform-flag" name="flag" required>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-points">Points *</label>
-                            <input type="number" class="form-control rounded w-50 h-50" min="0" id="challform-points" name="points" value="500" required>
+                        <div class="input-group mb-1 w-50">
+                            <span class="input-group-text">Name</span>
+                            <input type="text" class="form-control" id="challform-name" name="name" required>
                         </div>
-                        <div class="subfield">
-                            <label for="challform-category">Category *</label>
-                            <select class="form-control rounded w-50 h-20 selectpicker" name="category" required>
+
+                        <div class="input-group mb-1 w-50 mx-1">
+                            <span class="input-group-text"><i class="bi bi-flag-fill"></i></span>
+                            <input type="text" class="form-control" id="challform-flag" name="flag" required placeholder="flag">
+                        </div>
+                    </div>
+
+                    <div class="multifield d-flex justify-content-between">
+                        <div class="subfield input-group mb-1 w-15">
+                            <span class="input-group-text">Points</span>
+                            <input type="number" class="form-control" min="0" id="challform-points" name="points" value="500" required>
+                        </div>
+                        <div class="subfield input-group mb-1 w-15 mx-1">
+                            <span class="input-group-text">Category</span>
+                            <select class="form-control selectpicker" name="category" required>
                                 <option value="" disabled selected="true">Select...</option>
                                 {{ range .Categories }}
                                     <option value="{{ . }}">{{ . }}</option>
                                 {{ end }}
                             </select>
                         </div>
-                        <div class="subfield">
-                            <label for="challform-difficulty">Difficulty *</label>
-                            <select class="form-control rounded w-50 h-20 selectpicker" name="difficulty" required data-live-search="true">
+                        <div class="subfield input-group mb-1 w-15 mx-1">
+                            <span class="input-group-text">Difficulty</span>
+                            <select class="form-control selectpicker" name="difficulty" required data-live-search="true">
                                 <option value="" disabled selected="true">Select...</option>
                                 {{ range .Difficulties }}
                                     <option value="{{ . }}">{{ . }}</option>
@@ -59,50 +66,50 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label for="challform-desc">Description</label>
-                        <textarea type="textarea" class="form-control rounded w-50 h-50" id="challform-desc" name="description" placeholder="HTML is accepted!"></textarea>
+                    <div class="input-group mb-1">
+                        <span class="input-group-text">Description</span>
+                        <textarea type="textarea" class="form-control" id="challform-desc" name="description" placeholder="HTML is accepted!"></textarea>
                     </div>
 
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-hint1">Hint 1</label>
-                            <input type="text" class="form-control rounded w-50" id="challform-hint1" name="hint1">
+                    <div class="multifield d-flex mb-1">
+                        <div class="subfield input-group w-50">
+                            <span class="input-group-text">Hint-1</span>
+                            <input type="text" class="form-control w-50" id="challform-hint1" name="hint1">
                         </div>
-                        <div class="subfield">
-                            <label for="challform-hint2">Hint 2</label>
-                            <input type="text" class="form-control rounded w-50" id="challform-hint2" name="hint2">
-                        </div>
-                    </div>
-
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-host">Host</label>
-                            <input type="text" class="form-control rounded w-50" id="challform-host" name="host">
-                        </div>
-                        <div class="subfield">
-                            <label for="challform-port">Port</label>
-                            <input type="number" class="form-control rounded w-25 h-50" min="0" max="65535" id="challform-port" name="port">
+                        <div class="subfield input-group w-50 mx-1">
+                            <span class="input-group-text">Hint-2</span>
+                            <input type="text" class="form-control w-50" id="challform-hint2" name="hint2">
                         </div>
                     </div>
 
-                    <div class="multifield">
-                        <div class="subfield">
-                            <label for="challform-files">Files (.zip)</label>
-                            <input type="file" class="form-control rounded w-50 h-75" id="challform-files" name="files">
+                    <div class="multifield d-flex mb-1">
+                        <div class="subfield input-group w-50">
+                            <span class="input-group-text">Host @</span>
+                            <input type="text" class="form-control w-50" id="challform-host" name="host">
                         </div>
-                        <div class="subfield">
-                            <label for="challform-hidden">Hidden</label>
-                            <input type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
+                        <div class="subfield input-group w-50 mx-1">
+                            <span class="input-group-text">Port</span>
+                            <input type="number" class="form-control w-50" min="0" max="65535" id="challform-port" name="port">
                         </div>
                     </div>
 
-                    <div>
-                        <label for="challform-extra">Extra</label>
-                        <input type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
+                    <div class="multifield d-flex mb-1">
+                        <div class="subfield input-group w-50">
+                            <span class="input-group-text">Files (.zip)<i class="bi bi-file-earmark-zip-fill"></i></span>
+                            <input class="form-control" type="file"  id="challform-files" name="files">
+                        </div>
+                        <div class="w-50 mx-1 align-self-center d-flex justify-content-end">
+                            <div class="subfield form-check form-switch">
+                                <label class="form-check-label" for="challform-hidden">Hidden</label>
+                                <input class="form-check-input" type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" checked>
+                            </div>
+                            <div class="subfield form-check form-switch mx-5">
+                                <label class="form-check-label" for="challform-extra">Extra</label>
+                                <input class="form-check-input" type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70">
+                            </div>
+                        </div>
                     </div>
-
-                    <button type="submit" class="btn btn-primary mx-auto">Create challenge</button>
+                    <button type="submit" class="btn btn-secondary mx-auto">Create challenge</button>
                 </form>
             </div>
 
@@ -120,39 +127,41 @@
                 {{ range $i, $chal := $chals }}
 
                 <div class="card">
-                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-bs-toggle="collapse" data-bs-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}" {{ if $chal.IsExtra }} style="background-color: #D6AD78" {{ else if $chal.Hidden }} style="background-color: #cbcbcb" {{ end }}>
+                    <div class="card-header" id="heading-{{ .Category }}-{{ $i }}" data-bs-toggle="collapse" data-bs-target="#collapse-{{ .Category }}-{{ $i }}" aria-expanded="false" aria-controls="collapse-{{ .Category }}-{{ $i }}" {{ if $chal.IsExtra }} style="background-color: #9a7441" {{ else if $chal.Hidden }} style="background-color: #858585" {{ end }}>
                         {{ .Name }} {{ if .Hidden }} <i class="fa fa-eye-slash" aria-hidden="true"></i> {{ end }} 
                     </div>
                     <div id="collapse-{{ .Category }}-{{ $i }}" class="collapse" aria-labelledby="heading-{{ .Category }}-{{ $i }}" data-parent="#challenges-accordion">
                         <div class="card-body">
-                            <form class="challform mx-auto" style="width: 95%" action="/admin/updatechal" method="POST" enctype="multipart/form-data">
+                            <form class="challform mx-auto" action="/admin/updatechal" method="POST" enctype="multipart/form-data">
 
-                                <div>
-                                    <label for="challform-name">Name *</label>
-                                    <input type="text" id="challform-name" name="name" required value="{{ .Name }}">
-                                </div>
+                                <div class="d-flex w-100 mb-1">
+                                    <div class="input-group w-50">
+                                        <span class="input-group-text">Name</span>
+                                        <input class="form-control" type="text" id="challform-name" name="name" required value="{{ .Name }}">
+                                    </div>
 
-                                <div>
-                                    <label for="challform-flag">Flag *</label>
-                                    <input type="text" id="challform-flag" name="flag" required value="{{ .Flag }}">
+                                    <div class="input-group w-50 mx-1">
+                                        <span class="input-group-text"><i class="bi bi-flag-fill"></i></span>
+                                        <input class="form-control" type="text" id="challform-flag" name="flag" required value="{{ .Flag }}">
+                                    </div>
                                 </div>
             
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-points">Points *</label>
-                                        <input type="number" min="0" id="challform-points" name="points" value="{{ .MaxPoints }}" required>
+                                <div class="multifield d-flex w-100 mb-1">
+                                    <div class="subfield input-group w-33">
+                                        <span class="input-group-text">Points</span>
+                                        <input class="form-control" type="number" min="0" id="challform-points" name="points" value="{{ .MaxPoints }}" required>
                                     </div>
-                                    <div class="subfield">
-                                        <label for="challform-category">Category *</label>
-                                        <select name="category" required>
+                                    <div class="subfield input-group w-33 mx-1">
+                                        <span class="input-group-text">Category</span>
+                                        <select class="form-control" name="category" required>
                                             {{ range $cats }}
                                                 <option value="{{ . }}" {{ if eq $chal.Category . }}selected{{ end }}>{{ . }}</option>
                                             {{ end }}
                                         </select>
                                     </div>
-                                    <div class="subfield">
-                                        <label for="challform-difficulty">Difficulty *</label>
-                                        <select name="difficulty" required>
+                                    <div class="subfield input-group w-33 mx-1">
+                                        <span class="input-group-text">Difficulty</span>
+                                        <select class="form-control" name="difficulty" required>
                                             {{ range $diffs }}
                                                 <option value="{{ . }}" {{ if eq $chal.Difficulty . }}selected{{ end }}>{{ . }}</option>
                                             {{ end }}
@@ -160,51 +169,51 @@
                                     </div>
                                 </div>
             
-                                <div>
-                                    <label for="challform-desc">Description</label>
-                                    <textarea type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!">{{ .Description }}</textarea>
+                                <div class="input-group w-100 mb-1">
+                                    <span class="input-group-text">Description</span>
+                                    <textarea class="form-control" type="textarea" id="challform-desc" name="description" placeholder="HTML is now accepted!">{{ .Description }}</textarea>
                                 </div>
             
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-hint1">Hint 1</label>
-                                        <input type="text" id="challform-hint1" name="hint1" {{ if .Hint1 }} value="{{ .Hint1 }}" {{ end }}>
+                                <div class="multifield d-flex mb-1">
+                                    <div class="subfield input-group">
+                                        <span class="input-group-text">Hint-1</span>
+                                        <input class="form-control" type="text" id="challform-hint1" name="hint1" {{ if .Hint1 }} value="{{ .Hint1 }}" {{ end }}>
                                     </div>
-                                    <div class="subfield">
-                                        <label for="challform-hint2">Hint 2</label>
-                                        <input type="text"id="challform-hint2" name="hint2" {{ if .Hint2 }} value="{{ .Hint2 }}" {{ end }}>
+                                    <div class="subfield input-group mx-1">
+                                        <span class="input-group-text">Hint-2</span>
+                                        <input class="form-control" type="text"id="challform-hint2" name="hint2" {{ if .Hint2 }} value="{{ .Hint2 }}" {{ end }}>
                                     </div>
                                 </div>
             
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-host">Host</label>
-                                        <input type="text" id="challform-host" name="host" {{ if .Host }} value="{{ .Host }}" {{ end }}>
+                                <div class="multifield d-flex mb-1 w-100">
+                                    <div class="subfield input-group">
+                                        <span class="input-group-text">Host @</span>
+                                        <input class="form-control" type="text" id="challform-host" name="host" {{ if .Host }} value="{{ .Host }}" {{ end }}>
                                     </div>
-                                    <div class="subfield">
-                                        <label for="challform-port">Port</label>
-                                        <input type="number" min="0" max="65535" id="challform-port" name="port" {{ if .Port }} value="{{ .Port }}" {{ end }}>
-                                    </div>
-                                </div>
-
-                                <div class="multifield">
-                                    <div class="subfield">
-                                        <label for="challform-files">Files (.zip)</label>
-                                        <input type="file" id="challform-files" name="files">
-                                    </div>
-                                    <div class="subfield">
-                                        <label for="challform-hidden">Hidden</label>
-                                        <input type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
+                                    <div class="subfield input-group">
+                                        <span class="input-group-text">Port</span>
+                                        <input class="form-control" type="number" min="0" max="65535" id="challform-port" name="port" {{ if .Port }} value="{{ .Port }}" {{ end }}>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label for="challform-extra">Extra</label>
-                                    <input type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .IsExtra }} checked {{ end }}>
+                                <div class="multifield d-flex mb-1 w-100">
+                                    <div class="subfield input-group w-50">
+                                        <span class="input-group-text">Files (.zip)<i class="bi bi-file-earmark-zip-fill"></i></span>
+                                        <input class="form-control" type="file" id="challform-files" name="files">
+                                    </div>
+                                    <div class="d-flex align-self-center justify-content-end w-50 mx-1">
+                                        <div class="subfield form-check form-switch">
+                                            <label class="form-check-label" for="challform-hidden">Hidden</label>
+                                            <input class="form-check-input" type="checkbox" id="challform-hidden" name="is_hidden" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .Hidden }} checked {{ end }}>
+                                        </div>
+                                        <div class="subfield form-check form-switch mx-5">
+                                            <label class="form-check-label" for="challform-extra">Extra</label>
+                                            <input class="form-check-input" type="checkbox" id="challform-extra" name="is_extra" data-bs-toggle="toggle" data-onstyle="primary" data-offstyle="secondary" data-width="70" {{ if .IsExtra }} checked {{ end }}>
+                                        </div>
+                                    </div>
                                 </div>
-
                                 <input type="hidden" name="id" value="{{ .ID }}">
-                                <button type="submit" class="btn btn-primary">Update challenge</button>
+                                <button type="submit" class="btn btn-secondary">Update challenge</button>
                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletechalModal" data-name="{{ .Name }}">Delete challenge</button>
                                 <!-- <button type="submit" class="btn btn-danger" name="delete" value="true">Delete challenge</button> -->
                             </form>

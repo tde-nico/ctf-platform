@@ -7,7 +7,7 @@
     Chart.defaults.scale.gridLines.zeroLineColor = '#cdd6f4';
     Chart.defaults.scale.gridLines.color = '#181825';
 </script>
-<h3 class="text-center">Hall of Fame</h3>
+<h3 class="text-center pixelated-title">Hall of Fame</h3>
 <div class="container my-5">
     <div>
         <canvas id="chart" class="scoreboard-chart"></canvas>
@@ -25,7 +25,6 @@
             </tr>
         </thead>
         <tbody class="my-5">
-            <tr height="15px"></tr>
 
             {{ range $i, $user := .Users }}
             <tr class="table">

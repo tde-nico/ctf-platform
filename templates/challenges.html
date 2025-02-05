@@ -1,125 +1,127 @@
 {{define "content"}}
+<div class="container mt-5">
+    <div class="my-5 text-center">
+        <h2 class="pixelated-title">Challenges</h2>
+    </div>
 
-<div class="my-5 text-center">
-    <h2>Challenges</h2>
-</div>
-
-{{ $user := .User }}
-{{ $solves := .Solves }}
-{{ range $_, $chalsData := .Challenges }} 
-    {{ $cat := $chalsData.Category }}
-    {{ $chals := $chalsData.Challenges }}
-    {{ if or ($chals | is_visible_category) $user.IsAdmin }}
-        {{ if eq $cat "Crypto" }}
-            <h3 class="text-center"> {{ $cat }} <i class="bi bi-unlock-fill"></i> </h3>
-        {{ else if eq $cat "Web" }}
-            <h3 class="text-center"> {{ $cat }} <i class="bi bi-browser-safari"></i> </h3>
-        {{ else if eq $cat "Reverse" }}
-            <h3 class="text-center"> {{ $cat }} <i class="bi bi-wrench-adjustable"></i> </h3>
-        {{ else if eq $cat "Pwn" }}
-            <h3 class="text-center"> {{ $cat }} <i class="bi bi-file-earmark-binary-fill"></i> </h3>
-        {{ else if eq $cat "Intro" }}
-            <h3 class="text-center"> {{ $cat }} <i class="bi bi-play-fill"></i> </h3>
-        {{ else }}
-            <h3 class="text-center"> {{ $cat }} </h3>
-        {{ end }}
-
-        <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
-            {{ range $i, $chal :=  $chals }}
-                {{ if or (not $chal.Hidden) $user.IsAdmin }}
-                <div class="chall-box grid-item">
-                        <button class="btn chall-preview{{ if $chal.Hidden }} chall-hidden {{ else if (index $solves $chal.Name) }}  chall-solved {{ end }} w-100 h-100 chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }}chall-extra{{ end }} " name="{{ $chal.ID }}">
-                            <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
-                            <div class="chall-footer">
-                                <h5 class="chall-points">{{ $chal.Points }}pt</h5>
-                            </div>
-                        </button>
-                </div>
-                {{ end }}
-            {{ end }}
-        </div>
-    {{ end }}
-{{ end }}
-
-<div id="overlay" class="overlay"></div>
-{{ range $_, $chalsData := .Challenges }} 
-    {{ $cat := $chalsData.Category }}
-    {{ $chals := $chalsData.Challenges }}
-    {{ range $chal := $chals }}
-        {{ if or (not $chal.Hidden) $user.IsAdmin }}
-            <div class="d-none {{ $chal.ID }} chall-toggle position-fixed chall-toggle-{{ $chal.Difficulty }} {{ if (index $solves $chal.Name) }} chall-toggle-solved {{ end }}">
-                <i class="bi bi-x-lg position-absolute top-0 end-0 m-3 chall-close" style="cursor: pointer;"></i>
-                <div class="text-center p-4">
-                    <h1 class="chall-dial-name"> {{ $chal.Name }} </h1>
-                    <h5 class="chall-dial-difficulty"> {{ $chal.Difficulty }}</h5>
-                    <div class="chall-dial-info d-flex justify-content-between">
-                        <h3 class="chall-dial-solves"> {{ $chal.Solves }} Solves</h3>
-                        <h4 class="chall-dial-points"> {{ $chal.Points }} Points</h4>
-                    </div>
-                    
-                    
-                    <div class="mt-3 mb-3 ml-3 mr-3" style="text-decoration: none;">
-                        {{ if eq $chal.Description ""}}
-                        {{ else }}
-                            <div class="chall-description">
-                                <div class="p-2">
-                                {{ $rows := split "\n" $chal.Description }}
-                                {{ range $index, $row := $rows }}
-                                    <h6 class="mb-0">{{ $row }}</h6>
-                                {{ end }}
-                                </div>
-                            </div>
-                        {{ end }}
-                    </div>
+    {{ $user := .User }}
+    {{ $solves := .Solves }}
+    {{ range $_, $chalsData := .Challenges }} 
+        {{ $cat := $chalsData.Category }}
+        {{ $chals := $chalsData.Challenges }}
+        {{ if or ($chals | is_visible_category) $user.IsAdmin }}
+            {{ if eq $cat "Crypto" }}
                 
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} <i class="bi bi-unlock-fill"></i> </h3>
+            {{ else if eq $cat "Web" }}
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} <i class="bi bi-browser-safari"></i> </h3>
+            {{ else if eq $cat "Reverse" }}
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} <i class="bi bi-wrench-adjustable"></i> </h3>
+            {{ else if eq $cat "Pwn" }}
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} <i class="bi bi-file-earmark-binary-fill"></i> </h3>
+            {{ else if eq $cat "Intro" }}
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} <i class="bi bi-play-fill"></i> </h3>
+            {{ else }}
+                <h3 class="text-center pixelated-subtitle"> {{ $cat }} </h3>
+            {{ end }}
 
-                    {{ if $chal.Files }}
-                        <div class="chall-dial-attatchments text-start">
-                            <h4>Attachments:</h4>
-                            {{ $files := split "," $chal.Files }}
-                            {{ range $file := $files }}
-                                <div>
-                                    <a href="{{ $file }}" class="chall-dial-attatchment">
-                                        <i class="bi bi-file-earmark-arrow-down-fill"></i> {{ $file | split "/" | last }}
-                                    </a>
+            <div class="grid row mx-auto mb-5 ml-auto" data-masonry='{ "itemSelector": ".grid-item", "columnWidth": 300, "gutter": 10 ,"isFitWidth": true}'>
+                {{ range $i, $chal :=  $chals }}
+                    {{ if or (not $chal.Hidden) $user.IsAdmin }}
+                    <div class="chall-box grid-item">
+                            <button class="btn chall-preview{{ if $chal.Hidden }} chall-hidden {{ else }} {{if (index $solves $chal.Name) }}  chall-solved {{ end }} chall-{{ $chal.Difficulty }} {{ if $chal.IsExtra }} chall-extra {{ end }} {{end}} w-100 h-100  " name="{{ $chal.ID }}">
+                                <h4 class="chall-title"> {{ $chal.Name }} {{ if $chal.Hidden }}<i class="fa fa-eye-slash" aria-hidden="true"></i>{{ end }} </h4>
+                                <div class="chall-footer">
+                                    <h5 class="chall-points">{{ $chal.Points }}pt</h5>
                                 </div>
-                            {{ end }}
-                        </div>
-                    {{ end }}
-                    {{ if and $chal.Host $chal.Port }}
-                        <div class="chall-dial-remote my-3 text-start">
-                            <h6 class="chall-dial-netcat-message">This is a remote challenge, connect via: </h6>
-                            <h6 class="chall-dial-netcat">
-                                <i class="bi bi-clipboard-fill chall-netcat-copy" style="cursor: pointer;"> nc {{ $chal.Host }} {{ $chal.Port }}</i>
-                            </h6>
-                        </div>
-                    {{ else if $chal.Host }}
-                        <a href="{{ $chal.Host }}"><i class="bi bi-link-45deg"></i><h6 class="my-3">{{ $chal.Host }}</h6></a>
-                    {{ end }}
-                    {{ if $chal.Hint1 }}
-                        <p class="mt-5 mb-3">&bull; {{ $chal.Hint1 }} </p>
-                    {{ end }}
-                    {{ if $chal.Hint2 }}
-                        <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
-                    {{ end }}
-                    {{ if not (index $solves $chal.Name) }}
-                        <form class="mb-4 submit-form" action="/submit" method="POST">
-                            <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
-                                <input type="hidden" name="challID" value="{{ $chal.ID }}">
-                                <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn chall-submit" name="{{ $chal.ID }}">Submit</button>
-                                </div>
-                            </div>
-                        </form>
-                    {{ else }}
-                        <h6 class="my-4"> Challenge already solved</h6>
-                    {{ end }}
+                            </button>
                     </div>
+                    {{ end }}
+                {{ end }}
             </div>
         {{ end }}
     {{ end }}
-{{ end }}
+
+    <div id="overlay" class="overlay"></div>
+    {{ range $_, $chalsData := .Challenges }} 
+        {{ $cat := $chalsData.Category }}
+        {{ $chals := $chalsData.Challenges }}
+        {{ range $chal := $chals }}
+            {{ if or (not $chal.Hidden) $user.IsAdmin }}
+                <div class="d-none {{ $chal.ID }} chall-toggle position-fixed chall-toggle-{{ $chal.Difficulty }} {{ if (index $solves $chal.Name) }} chall-toggle-solved {{ end }}">
+                    <i class="bi bi-x-lg position-absolute top-0 end-0 m-3 chall-close" style="cursor: pointer;"></i>
+                    <div class="text-center p-4">
+                        <h1 class="chall-dial-name"> {{ $chal.Name }} </h1>
+                        <h5 class="chall-dial-difficulty"> {{ $chal.Difficulty }}</h5>
+                        <div class="chall-dial-info d-flex justify-content-between">
+                            <h3 class="chall-dial-solves"> {{ $chal.Solves }} Solves</h3>
+                            <h4 class="chall-dial-points"> {{ $chal.Points }} Points</h4>
+                        </div>
+                        
+                        
+                        <div class="mt-3 mb-3 ml-3 mr-3" style="text-decoration: none;">
+                            {{ if eq $chal.Description ""}}
+                            {{ else }}
+                                <div class="chall-description">
+                                    <div class="p-2">
+                                    {{ $rows := split "\n" $chal.Description }}
+                                    {{ range $index, $row := $rows }}
+                                        <h6 class="mb-0">{{ $row }}</h6>
+                                    {{ end }}
+                                    </div>
+                                </div>
+                            {{ end }}
+                        </div>
+                    
+
+                        {{ if $chal.Files }}
+                            <div class="chall-dial-attatchments text-start">
+                                <h4>Attachments:</h4>
+                                {{ $files := split "," $chal.Files }}
+                                {{ range $file := $files }}
+                                    <div>
+                                        <a href="{{ $file }}" class="chall-dial-attatchment">
+                                            <i class="bi bi-file-earmark-arrow-down-fill"></i> {{ $file | split "/" | last }}
+                                        </a>
+                                    </div>
+                                {{ end }}
+                            </div>
+                        {{ end }}
+                        {{ if and $chal.Host $chal.Port }}
+                            <div class="chall-dial-remote my-3 text-start">
+                                <h6 class="chall-dial-netcat-message">This is a remote challenge, connect via: </h6>
+                                <h6 class="chall-dial-netcat">
+                                    <i class="bi bi-clipboard-fill chall-netcat-copy" style="cursor: pointer;"> nc {{ $chal.Host }} {{ $chal.Port }}</i>
+                                </h6>
+                            </div>
+                        {{ else if $chal.Host }}
+                            <a href="{{ $chal.Host }}"><i class="bi bi-link-45deg"></i><h6 class="my-3">{{ $chal.Host }}</h6></a>
+                        {{ end }}
+                        {{ if $chal.Hint1 }}
+                            <p class="mt-5 mb-3">&bull; {{ $chal.Hint1 }} </p>
+                        {{ end }}
+                        {{ if $chal.Hint2 }}
+                            <p class="my-3">&bull; {{ $chal.Hint2 }} </p>
+                        {{ end }}
+                        {{ if not (index $solves $chal.Name) }}
+                            <form class="mb-4 submit-form" action="/submit" method="POST">
+                                <div class="input-group mt-5 mb-2 mx-auto" style="width: 90%">
+                                    <input type="hidden" name="challID" value="{{ $chal.ID }}">
+                                    <input type="text" class="form-control chall-flag rounded-start" placeholder="flag" name="flag">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn chall-submit" name="{{ $chal.ID }}">Submit</button>
+                                    </div>
+                                </div>
+                            </form>
+                        {{ else }}
+                            <h6 class="my-4"> Challenge already solved</h6>
+                        {{ end }}
+                        </div>
+                </div>
+            {{ end }}
+        {{ end }}
+    {{ end }}
+    </div>
 
 <!--Challenges tiling scripts-->
 <script src="/static/js/challenge.js"></script>

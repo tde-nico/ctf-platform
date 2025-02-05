@@ -14,7 +14,7 @@ body {
     0% { background-color: red; }
     33% { background-color: blue; }
     67% { background-color: green; }
-    100% { background-color: red; }
+    100% { background-color: rgb(142, 141, 141); }
 }
 
 .category_badge {
@@ -70,30 +70,6 @@ body {
 }
 
 /* admin */
-.challform { width: 95%; }
-.challform > div { margin: 11px; }
-.challform > div, .challform > div .subfield { display: flex; }
-.challform > div .subfield { flex: 1 1 0px; }
-.challform label:not(.btn) {
-    flex: 0 0 120px;
-    margin: auto 0;
-    text-align: right;
-    padding-right: 7px;
-}
-.challform input, .challform select, .challform textarea {
-    flex: 1 0 auto;
-    margin: auto 0;
-    height: 100%;
-    min-height: 30px;
-}
-.challform textarea { height: 80px; }
-
-@media screen and (min-width: 1000px) {
-    .challform select[name=category] { margin-right: 10px; }
-}
-@media screen and (max-width: 1000px) {
-    .challform > div.multifield { flex-direction: column; }
-}
 
 /* Leaderboard */
 .leaderboard-username {
@@ -122,22 +98,22 @@ body {
     border-color: #b4befe;
 }
 .chall-title {
-    font-family: 'Pixelify Sans', sans-serif;
-    font-size: 1.5em;
+    font-family: 'ProggyTinyTT', sans-serif;
+    font-size: 2em;
 }
 .chall-footer{
     display: flex;
     justify-content: space-between;
 }
 .chall-points{
-    font-family: 'Pixelify Sans', sans-serif;
-    font-size: 1em;
+    font-family: 'ProggyTinyTT', sans-serif;
+    font-size: 1.5em;
     position: absolute;
     bottom: 0;
     right: 15px;
 }
 .chall-difficulty {
-    font-family: 'Pixelify Sans', sans-serif;
+    font-family: 'ProggyTinyTT', sans-serif;
     font-size: 1.5em;
 }
 .chall-medium {
@@ -186,6 +162,11 @@ body {
     box-shadow: 0 0 5px 1px #a6e3a1;
     background: linear-gradient(45deg, #40a02b 90%, #00ffb9 120%);
     border-color: #40a02b;
+}
+.chall-hidden{
+    box-shadow: 0 0 5px 1px #adadad;
+    background: linear-gradient(45deg, #494949 90%, #b3b3b3 120%);
+    border-color: #b3b3b3;
 }
 .chall-solved:hover {
     border-color: #00ffb9;
@@ -248,8 +229,8 @@ body {
     color: #191926;
 }
 .chall-dial-name{
-    font-family: 'Pixelify Sans', sans-serif;
-    font-size: 2em;
+    font-family: 'ProggyTinyTT', sans-serif;
+    font-size: 2.5em;
 }
 .chall-dial-points{
     font-size: 1.5em;
@@ -291,10 +272,11 @@ body {
     padding-right: 20px;
     height: 70px;
 }
-.navbar-brand {
-    font-family: 'Pixelify Sans', sans-serif;
-    font-size: 1.5em;
-    color: #eff1f5;
+.platform-title{
+    font-family: 'ProggyTinyTT', sans-serif;
+    font-size: 2em;
+    text-decoration: none;
+    color: inherit;
 }
 .login-form {
     background-color: #181825 !important;
@@ -320,12 +302,21 @@ body {
     background-color: #11111b;
     color: #cdd6f4;
 }
+.pixelated-title {
+    font-family: 'ProggyTinyTT', sans-serif, monospace;
+    font-size: 3em;
+}
+.pixelated-subtitle {
+    font-family: 'ProggyTinyTT', sans-serif, monospace;
+    font-size: 2.5em;
+}
 
 /* Scoreboard */
 .scoreboard-username {
     text-decoration: none;
     color: inherit;
-    font-family: 'Pixelify Sans', sans-serif, monospace;
+    font-family: 'ProggyTinyTT', sans-serif, monospace;
+    font-size: 1.5em;
 }
 .table {
     --bs-table-bg: inherit !important;

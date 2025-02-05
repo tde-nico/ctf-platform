@@ -1,6 +1,6 @@
 {{define "content"}}
 <div class="container my-5">
-  <h3 class="my-5">Player profile</h3>
+  <h3 class="my-5 pixelated-title">Player profile</h3>
   <br>
   <p>Username: {{ .UserProfile.Username }}</p>
 
@@ -20,8 +20,8 @@
         </thead>
       {{ range .Solves }}
         <tr>
-          <td>{{ .ChalName }}</td>
-            <td>{{ .Timestamp.Format "15:04 02-01-2006" }}</td>
+          <td class="scoreboard-username">{{ .ChalName }}</td>
+            <td class="scoreboard-username">{{ .Timestamp.Format "15:04 02-01-2006" }}</td>
         </tr>
       {{ end }}
     </table>

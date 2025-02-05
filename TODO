@@ -6,16 +6,16 @@ Backend:
 		nuovo ruolo Spectator
 
 Frontend:
-	mobile support (hamburger)
-	check box in devtools non al centro e di dimensione giusta
-	dare uno stile alle check box
-	cambio font dei numeri
-	applicare il font ovunque
+	√ mobile support (hamburger)
+	√ check box in devtools non al centro e di dimensione giusta
+	√ dare uno stile alle check box
+	√ cambio font dei numeri
+	√ applicare il font ovunque
 	fixare l'end of page, tipo in config di /admin (non arriva correttamente in fondo)
 	togliere lo scomparire e riapparire della scheda della flag se la flag è sbagliata
-	cambiare i colori delle chall nascoste nella pagina delle chall
-	cambiare il colore delle chall nascoste e extra nell'admin page delle challenge
-	rimuovere lo spazio vuoto che si crea sotto i flash quando presenti
+	√ cambiare i colori delle chall nascoste nella pagina delle chall
+	√ cambiare il colore delle chall nascoste e extra nell'admin page delle challenge
+	√ rimuovere lo spazio vuoto che si crea sotto i flash quando presenti
 	forse: spostare la X dei flash a destra e dargli uno stile
 	fixare la X del resetpassword dal pannello admin
 
