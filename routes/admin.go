@@ -35,6 +35,7 @@ func admin(ctx *middleware.Ctx) {
 	}
 
 	data.Categories = db.CATEGORIES
+	data.Categories = append(data.Categories, "Intro")
 	data.Difficulties = db.DIFFICULTIES
 
 	data.Challenges, err = db.GetChallenges()
