@@ -24,4 +24,5 @@ func InitStore(key []byte) {
 	store.Options.Path = "/"
 	store.Options.Secure = false
 	store.Options.SameSite = http.SameSiteDefaultMode
+	store.Options.MaxAge = 30 * 24 * 60 * 60
 }
