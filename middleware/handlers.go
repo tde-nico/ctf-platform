@@ -9,7 +9,7 @@ func HandleFunc(pattern string, handler func(ctx *Ctx)) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := InitCtx(w, r)
 		if err != nil {
-			log.Errorf("Error initializing context: %v", err)
+			log.Warningf("Error initializing context: %v", err)
 			return
 		}
 
@@ -21,7 +21,7 @@ func AuthHandleFunc(pattern string, handler func(ctx *Ctx)) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := InitCtx(w, r)
 		if err != nil {
-			log.Errorf("Error initializing context: %v", err)
+			log.Warningf("Error initializing context: %v", err)
 			return
 		}
 
@@ -44,7 +44,7 @@ func AdminHandleFunc(pattern string, handler func(ctx *Ctx)) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		ctx, err := InitCtx(w, r)
 		if err != nil {
-			log.Errorf("Error initializing context: %v", err)
+			log.Warningf("Error initializing context: %v", err)
 			return
 		}
 

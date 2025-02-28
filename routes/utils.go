@@ -29,7 +29,7 @@ type DataInterface interface {
 const MAX_PASSWORD_LENGTH = 6
 const CHALLENGE_FILES_DIR = "./files"
 
-var USERNAME_REGEX = regexp.MustCompile(`[0-9a-zA-Z_!@#€\-&+]{4,32}`)
+var USERNAME_REGEX = regexp.MustCompile(`^[0-9a-zA-Z_\-]{4,32}$`)
 
 func (d *Data) UpdateFlashes(flashes []middleware.Flash) {
 	d.Flashes = flashes

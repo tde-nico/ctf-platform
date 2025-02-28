@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"platform/db"
+	"platform/log"
 	"platform/middleware"
 )
 
@@ -32,7 +33,9 @@ func userInfo(ctx *middleware.Ctx) {
 	var err error
 	data.UserProfile, err = db.GetUserByUsername(username)
 	if err != nil {
-		ctx.InternalError(fmt.Errorf("error getting user by username: %v", err))
+		log.Warningf("Error getting user by username: %v", err)
+		ctx.AddFlash("Invalid username")
+		ctx.Redirect("/", http.StatusSeeOther)
 		return
 	}
 
