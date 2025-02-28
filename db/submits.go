@@ -128,7 +128,7 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 			}
 
 			log.Noticef("First Blood on %s from %s", chal.Name, user.Username)
-			err = telegram_bot.SendTelegramMsg(token, int64(id), chal.Name, user.Username)
+			err = telegram_bot.SendTelegramMsg(token, id, chal.Name, user.Username)
 			if err != nil {
 				log.Error(err)
 			}

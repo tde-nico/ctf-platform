@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func GetConfig(key string) (int, error) {
+func GetConfig(key string) (int64, error) {
 	query, err := GetStatement("GetConfig")
 	if err != nil {
 		return 0, fmt.Errorf("error getting statement: %v", err)
@@ -20,7 +20,7 @@ func GetConfig(key string) (int, error) {
 		return 0, fmt.Errorf("error scanning config: %v", err)
 	}
 
-	var value int
+	var value int64
 	err = rows.Scan(&value)
 	if err != nil {
 		return 0, fmt.Errorf("error scanning config: %v", err)
