@@ -62,7 +62,7 @@ func scores(ctx *middleware.Ctx) {
 		return
 	}
 
-	users, err := db.GetUsersScores()
+	users, err := db.GetUsersScoreboard()
 	if err != nil {
 		ctx.InternalError(fmt.Errorf("error getting users: %v", err))
 		return

@@ -150,3 +150,235 @@ BEGIN
     )
   );
 END;
+
+
+DROP TRIGGER IF EXISTS update_badges_on_solve_insert;
+DROP TRIGGER IF EXISTS update_badges_on_solve_delete;
+DROP TRIGGER IF EXISTS update_badges_on_challenge_update;
+DROP TRIGGER IF EXISTS update_badges_on_challenge_insert;
+DROP TRIGGER IF EXISTS update_badges_on_challenge_delete;
+
+CREATE TRIGGER IF NOT EXISTS update_badges_on_solve_insert
+AFTER INSERT ON solves
+BEGIN
+  INSERT OR IGNORE INTO badges (name, desc, extra, userid)
+  SELECT
+      c.category,
+      'Completed all ' || c.category || ' challenges',
+      0,
+      NEW.userid
+    FROM challenges AS c
+      WHERE c.id = NEW.chalid
+        AND (
+          SELECT COUNT(*)
+            FROM challenges AS c2
+            WHERE c2.category = c.category
+              AND c2.is_extra = 0
+              AND c2.hidden = 0
+              AND NOT EXISTS (
+                SELECT 1
+                  FROM solves AS s
+                  WHERE s.chalid = c2.id
+                    AND s.userid = NEW.userid
+              )
+        ) = 0;
+
+  UPDATE badges
+    SET extra = 1
+    WHERE userid = NEW.userid
+      AND extra = 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND c.is_extra = 1
+      ) > 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND NOT EXISTS (
+              SELECT 1
+                FROM solves AS s
+                WHERE s.chalid = c.id
+                  AND s.userid = NEW.userid
+              )
+      ) = 0;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_badges_on_solve_delete
+AFTER DELETE ON solves
+BEGIN
+  DELETE FROM badges
+    WHERE userid = OLD.userid
+      AND name = (
+        SELECT category
+          FROM challenges
+          WHERE id = OLD.chalid
+      );
+
+  INSERT OR IGNORE INTO badges (name, desc, extra, userid)
+  SELECT
+      c.category,
+      'Completed all ' || c.category || ' challenges',
+      0,
+      OLD.userid
+    FROM challenges AS c
+      WHERE c.id = OLD.chalid
+        AND (
+          SELECT COUNT(*)
+            FROM challenges AS c2
+            WHERE c2.category = c.category
+              AND c2.is_extra = 0
+              AND c2.hidden = 0
+              AND NOT EXISTS (
+                SELECT 1
+                  FROM solves AS s
+                  WHERE s.chalid = c2.id
+                    AND s.userid = OLD.userid
+              )
+        ) = 0;
+  
+  UPDATE badges
+    SET extra = 1
+    WHERE userid = OLD.userid
+      AND extra = 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND c.is_extra = 1
+      ) > 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND NOT EXISTS (
+              SELECT 1
+                FROM solves AS s
+                WHERE s.chalid = c.id
+                  AND s.userid = OLD.userid
+              )
+      ) = 0;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_badges_on_challenge_update
+AFTER UPDATE ON challenges
+WHEN NEW.category <> OLD.category OR NEW.is_extra <> OLD.is_extra OR NEW.hidden <> OLD.hidden
+BEGIN
+  DELETE FROM badges
+    WHERE name = OLD.category;
+
+  INSERT OR IGNORE INTO badges (name, desc, extra, userid)
+  SELECT
+      NEW.category,
+      'Completed all ' || NEW.category || ' challenges',
+      0,
+      u.id
+    FROM users AS u
+      WHERE (
+          SELECT COUNT(*)
+            FROM challenges AS c
+            WHERE c.category = NEW.category
+              AND c.is_extra = 0
+              AND c.hidden = 0
+              AND NOT EXISTS (
+                SELECT 1
+                  FROM solves AS s
+                  WHERE s.chalid = c.id
+                    AND s.userid = u.id
+              )
+        ) = 0;
+
+  UPDATE badges
+    SET extra = 1
+    WHERE name = NEW.category
+      AND extra = 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND c.is_extra = 1
+      ) > 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND NOT EXISTS (
+              SELECT 1
+                FROM solves AS s
+                WHERE s.chalid = c.id
+                  AND s.userid = badges.userid
+              )
+      ) = 0;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_badges_on_challenge_insert
+AFTER INSERT ON challenges
+BEGIN
+  DELETE FROM badges
+    WHERE name = NEW.category
+      AND NEW.is_extra = 0;
+
+  UPDATE badges
+    SET extra = 0
+    WHERE name = NEW.category;
+END;
+
+CREATE TRIGGER IF NOT EXISTS update_badges_on_challenge_delete
+AFTER DELETE ON challenges
+BEGIN
+  DELETE FROM badges
+    WHERE name = OLD.category;
+
+  INSERT OR IGNORE INTO badges (name, desc, extra, userid)
+  SELECT
+      OLD.category,
+      'Completed all ' || OLD.category || ' challenges',
+      0,
+      u.id
+    FROM users AS u
+      WHERE (
+          SELECT COUNT(*)
+            FROM challenges AS c
+            WHERE c.category = OLD.category
+              AND c.is_extra = 0
+              AND c.hidden = 0
+              AND NOT EXISTS (
+                SELECT 1
+                  FROM solves AS s
+                  WHERE s.chalid = c.id
+                    AND s.userid = u.id
+              )
+        ) = 0;
+
+  UPDATE badges
+    SET extra = 1
+    WHERE name = OLD.category
+      AND extra = 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND c.is_extra = 1
+      ) > 0
+      AND (
+        SELECT COUNT(*)
+          FROM challenges AS c
+          WHERE c.category = badges.name
+            AND c.hidden = 0
+            AND NOT EXISTS (
+              SELECT 1
+                FROM solves AS s
+                WHERE s.chalid = c.id
+                  AND s.userid = badges.userid
+              )
+      ) = 0;
+END;

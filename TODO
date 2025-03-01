@@ -1,7 +1,6 @@
 
 Backend:
-	creare categorie nel db
-	creare badge nel db con corrispettivi trigger
+	fetchare le categorie da db
 	new features:
 		nuovo ruolo Spectator
 
@@ -18,7 +17,7 @@ Frontend:
 
 Entambi:
 	consolidare login (rimovere il route GET di login?)
-	fixare resetpassword dal pannello admin (il campo username arriva vuoto dal form)
+	fixare reset-password dal pannello admin (il campo username arriva vuoto dal form)
 	
 	Feature Future:
 		batch update hidden challenges

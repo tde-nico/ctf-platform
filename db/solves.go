@@ -23,7 +23,7 @@ func FlagExists(flag string) error {
 	return nil
 }
 
-func getScores() ([]User, error) {
+func GetUsersScores() ([]User, error) {
 	query, err := GetStatement("GetUsersScores")
 	if err != nil {
 		return nil, fmt.Errorf("error getting statement: %v", err)
@@ -48,8 +48,13 @@ func getScores() ([]User, error) {
 	return users, nil
 }
 
-func getVisibleChallsByCategory() (map[string][]int, error) {
-	query, err := GetStatement("GetVisibleChallengesByCategory")
+func GetUsersScoreboard() ([]UserScore, error) {
+	users, err := GetUsersScores()
+	if err != nil {
+		return nil, err
+	}
+
+	query, err := GetStatement("GetUsersBadges")
 	if err != nil {
 		return nil, fmt.Errorf("error getting statement: %v", err)
 	}
@@ -60,76 +65,31 @@ func getVisibleChallsByCategory() (map[string][]int, error) {
 	}
 	defer rows.Close()
 
-	challs := make(map[string][]int)
+	badges := make(map[int][]Badge)
 	for rows.Next() {
-		var name string
-		var count, extra int
-		err = rows.Scan(&name, &count, &extra)
+		var badge Badge
+		var userID int
+		err = rows.Scan(&userID, &badge.Name, &badge.Desc, &badge.Extra)
 		if err != nil {
 			return nil, err
 		}
-		challs[name] = []int{count - extra, extra}
-	}
-
-	return challs, nil
-}
-
-func GetUsersScores() ([]UserScore, error) {
-	users, err := getScores()
-	if err != nil {
-		return nil, err
-	}
-
-	challs, err := getVisibleChallsByCategory()
-	if err != nil {
-		return nil, err
+		if _, ok := badges[userID]; !ok {
+			badges[userID] = make([]Badge, 0)
+		}
+		badge.Char = string(badge.Name[0])
+		badges[userID] = append(badges[userID], badge)
 	}
 
 	scoreUsers := make([]UserScore, len(users))
 	for i, user := range users {
 		scoreUsers[i].Username = user.Username
 		scoreUsers[i].Score = user.Score
-
-		solves, err := GetUserSolves(&user)
-		if err != nil {
-			return nil, err
-		}
-
-		counter := make(map[string][]int)
-		for _, s := range solves {
-			c, ok := counter[s.ChalCategory]
-			if !ok {
-				c = []int{0, 0}
-			}
-			if s.ChalExtra {
-				c[1]++
-			} else {
-				c[0]++
-			}
-			counter[s.ChalCategory] = c
-		}
-
-		for category, counts := range counter {
-			if category == "Intro" {
-				continue
-			}
-
-			challCounts, ok := challs[category]
-			if !ok {
-				continue
-			}
-			if challCounts[0] == counts[0] {
-				scoreUsers[i].Badges = append(scoreUsers[i].Badges, Badges{
-					Name:  category,
-					Char:  string(category[0]),
-					Extra: false,
-				})
-				if challCounts[1] > 0 && challCounts[1] == counts[1] {
-					scoreUsers[i].Badges[len(scoreUsers[i].Badges)-1].Extra = true
-				}
-			}
+		bgs, ok := badges[user.ID]
+		if ok {
+			scoreUsers[i].Badges = bgs
 		}
 	}
+
 	return scoreUsers, nil
 }
 

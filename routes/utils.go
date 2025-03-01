@@ -152,10 +152,16 @@ func getChallFromForm(ctx *middleware.Ctx) *db.Challenge {
 	isHidden := ctx.FormValue("is_hidden")
 	isExtra := ctx.FormValue("is_extra")
 
-	ID, err := strconv.Atoi(id)
-	if err != nil {
-		ctx.InternalError(fmt.Errorf("error converting ID to int: %v", err))
-		return nil
+	var ID int
+	var err error
+	if id != "" {
+		ID, err = strconv.Atoi(id)
+		if err != nil {
+			ctx.InternalError(fmt.Errorf("error converting ID to int: %v", err))
+			return nil
+		}
+	} else {
+		ID = -1
 	}
 
 	points, err := strconv.Atoi(maxPoints)

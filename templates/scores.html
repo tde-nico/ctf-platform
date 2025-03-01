@@ -48,7 +48,7 @@
                     {{ end }}
 
                     {{ range $badge := $user.Badges }}
-                        <span class="category_badge {{ if $badge.Extra }}extra-badge{{ end }}" data-toggle="tooltip" data-placement="top" title="{{ $user.Username }} solved all the currently available {{ $badge.Name }} challenges!">
+                        <span class="category_badge {{ if $badge.Extra }}extra-badge{{ end }}" data-toggle="tooltip" data-placement="top" title="{{ $badge.Desc }}">
                             {{ $badge.Char }}
                         </span>
                     {{ end }}

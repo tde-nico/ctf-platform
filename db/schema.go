@@ -53,8 +53,9 @@ type Submission struct {
 	Timestamp    time.Time
 }
 
-type Badges struct {
+type Badge struct {
 	Name  string
+	Desc  string
 	Char  string
 	Extra bool
 }
@@ -62,7 +63,7 @@ type Badges struct {
 type UserScore struct {
 	Username string
 	Score    int
-	Badges   []Badges
+	Badges   []Badge
 }
 
 type GraphData struct {

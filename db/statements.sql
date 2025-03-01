@@ -93,12 +93,6 @@ SELECT id
 	FROM challenges
 	WHERE flag = ?;
 
--- GetVisibleChallengesByCategory
-SELECT category, COUNT(id), SUM(is_extra)
-	FROM challenges
-	WHERE hidden = 0
-	GROUP BY category;
-
 -- GetUsersScores
 SELECT u.id, u.username, u.score
 	FROM users AS u
@@ -109,6 +103,12 @@ SELECT u.id, u.username, u.score
 	) AS s ON u.id = s.userid
 	WHERE u.is_admin = 0
 	ORDER BY u.score DESC, s.last_submission ASC;
+
+-- GetUsersBadges
+SELECT u.id, b.name, b.desc, b.extra
+	FROM users AS u, badges AS b
+	WHERE u.id = b.userid
+		AND b.name <> 'Intro';
 
 -- GetUserSolves
 SELECT c.name, c.category, c.is_extra, s.timestamp

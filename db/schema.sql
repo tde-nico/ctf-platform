@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS "keys" (
+	"name" TEXT NOT NULL,
+	"key" TEXT UNIQUE NOT NULL,
+	PRIMARY KEY("name")
+);
+
 CREATE TABLE IF NOT EXISTS "config" (
 	"key" TEXT NOT NULL,
 	"type" TEXT NOT NULL DEFAULT 'text',
@@ -18,6 +24,11 @@ CREATE TABLE IF NOT EXISTS "users" (
 	PRIMARY KEY("id")
 );
 
+CREATE TABLE IF NOT EXISTS "categories" (
+	"name" TEXT NOT NULL,
+	PRIMARY KEY("name")
+);
+
 CREATE TABLE IF NOT EXISTS "challenges" (
 	"id" INTEGER NOT NULL,
 	"name" TEXT UNIQUE NOT NULL,
@@ -35,7 +46,8 @@ CREATE TABLE IF NOT EXISTS "challenges" (
 	"hint2" TEXT,
 	"hidden" BOOLEAN NOT NULL DEFAULT 1 CHECK("hidden" IN (0, 1)),
 	"is_extra" BOOLEAN NOT NULL DEFAULT 0,
-	PRIMARY KEY("id")
+	PRIMARY KEY("id"),
+	FOREIGN KEY("category") REFERENCES "categories"("name")
 );
 
 CREATE TABLE IF NOT EXISTS "solves" (
@@ -59,8 +71,11 @@ CREATE TABLE IF NOT EXISTS "submissions" (
 	PRIMARY KEY("id")
 );
 
-CREATE TABLE IF NOT EXISTS "keys" (
+CREATE TABLE IF NOT EXISTS "badges" (
 	"name" TEXT NOT NULL,
-	"key" TEXT UNIQUE NOT NULL,
-	PRIMARY KEY("name")
+	"desc" TEXT NOT NULL,
+	"extra" BOOLEAN NOT NULL DEFAULT 0 CHECK("extra" IN (0, 1)),
+	"userid" INTEGER NOT NULL,
+	PRIMARY KEY("name", "userid"),
+	FOREIGN KEY("userid") REFERENCES "users"("id")
 );

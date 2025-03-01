@@ -80,7 +80,7 @@ func adminUpdateChall(ctx *middleware.Ctx) {
 	ctx.ParseMultipartForm()
 
 	chal := getChallFromForm(ctx)
-	if chal == nil {
+	if chal == nil || chal.ID == -1 {
 		return
 	}
 
