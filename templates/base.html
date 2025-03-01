@@ -3,7 +3,7 @@
 <html data-bs-theme="dark">
 
 <head>
-    <title>CyberChallenge CTF Platform</title>
+    <title>CC Sapienza Platform</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -27,74 +27,12 @@
 
 </head>
 
-<body style="font-family: monospace">
-    <!--
-    <nav class="navbar navbar-expand-lg">
-        <a class="navbar-brand" href="/">
-            <img src="/static/images/flag.gif" alt="" style="height: 2em;">
-            Cyber Challenge Sapienza CTF
-        </a>
-        <div class="ms-auto">
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbartoggler" aria-controls="navbartoggler" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse w-100" id="navbartoggler">
-            <ul class="navbar-nav w-100">
-            {{ if .User }}
-                {{ if .User.IsAdmin }}
-                <li class="nav-item my-auto">
-                    <a class="nav-link" href="/admin">DevTools <i class="bi bi-gear-fill"></i></a>
-                </li>
-                {{ end }}
-                <li class="nav-item my-auto">
-                    <a class="nav-link" href="/scores">Leaderboard <i class="bi bi-person-lines-fill"></i></a>
-                </li>
-                <li class="nav-item my-auto">
-                    <a class="nav-link" href="/challenges">Challenges <i class="bi bi-joystick"></i></a>
-                </li>
-                <li class="nav-item my-auto mx-5">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{ .User.Username}}</a>
-                    <div class="dropdown-menu dropdown-menu-end p-4">
-                        <a class="dropdown-item" href="/user/{{ .User.Username }}">Profile <i class="bi bi-person-fill"></i></a>
-                        <a class="dropdown-item" href="/logout">Logout <i class="bi bi-door-closed-fill"></i></a>
-                    </div>
-                </li>
-            {{ else }}
-                <li class="nav-item my-auto">
-                <a class="nav-link" href="/register">Register<i class="bi bi-person-fill-check"></i> </a>
-                </li>
-                <li class="nav-item my-auto">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Login
-                    <i class="bi bi-person-fill-check"></i>
-                </a>
-                <form class="dropdown-menu dropdown-menu-end p-4 login-form" action="/login" method="post" onsubmit="event.preventDefault(); loginUser();">
-                    <div class="form-group">
-                    <label for="LoginUsername">Username</label>
-                    <input type="text" class="form-control login-form-field" id="LoginUsername" name="username" placeholder="username" required>
-                    </div>
-                    <div class="form-group">
-                    <label for="LoginPassword">Password</label>
-                    <input type="password" class="form-control login-form-field" id="LoginPassword" name="password" placeholder="password" required>
-                    </div>
-                    <div class="form-group form-check text-end p-1">
-                    <button type="submit" class="btn btn-primary" onclick="event.stopPropagation();">Sign in</button>
-                    </div>
-                </form>
-                </li>
-            {{ end }}
-            </ul>
-        </div>
-    </nav>
-    -->
-    <nav class="navbar navbar-expand-lg w-100 h-100">
+<body class="d-flex flex-column min-vh-100">
+    <nav class="navbar navbar-expand-lg w-100 h-100 mb-0">
         <div class="container-fluid">
-            <div class="navbar-brand d-flex align-items-center" href="/">
-                <img src="/static/images/flag.gif" alt="" style="height: 2em;">
-                <a class="platform-title" href="/">Cyber Challenge Sapienza CTF</a>
-            </div>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="/static/images/flag.gif" alt="" style="height: 2em;" class="d-inline-block align-text-top">TRX Training Platform
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -158,7 +96,7 @@
 
     {{ with .Flashes }}
         {{ range . }}
-            <div class="alert alert-{{ .Type }} alert-dismissible fade show mb-0">
+            <div class="alert alert-{{ .Type }} alert-dismissible fade show mb-0 d-flex justify-content-between align-items-center" role="alert">
                 <strong>{{ .Message }}</strong>
                 <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -168,9 +106,9 @@
     {{ end }}
 
     <div class="w-100 h-100 main-content">
-        <br> {{template "content" .}}
-        <br>
+        {{template "content" .}}
     </div>
+
     <script>
         $(".notification-button").click(function(e) {
             var id = $(this).attr("notif-id");
@@ -182,9 +120,10 @@
         });
     </script>
 
-    <footer class="d-flex flex-wrap justify-content-between align-items-center footer">
-        <p class="col-md-4 mb-0">© 2025 TheRomanXpl0it</p>
-      </footer>
 </body>
+<footer class="footer d-flex flex-wrap justify-content-between align-items-center py-3 mt-auto w-100">
+    <p class="col-md-4 mb-0">© 2025 TheRomanXpl0it</p>
+</footer>
+
 </html>
 {{end}}

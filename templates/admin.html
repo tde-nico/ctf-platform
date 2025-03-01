@@ -288,7 +288,7 @@
                             <td></td>
                         {{ else }}
                         <td><button type="button" class="btn btn-outline-danger btn-sm float-right mr-3"
-                            data-bs-toggle="modal" data-bs-target="#resetpwModal" data-bs-username="{{ .Username }}">Reset password</button>
+                            data-bs-toggle="modal" data-bs-target="#resetpwModal" data-username="{{ .Username }}">Reset password</button>
                         </td>
                         {{ end }}
                     </tr>
@@ -330,9 +330,9 @@
     <div class="modal fade" id="deletechalModal" tabindex="-1" role="dialog" aria-labelledby="deletechalModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header d-flex justify-content-between">
                     <h5 class="modal-title" id="deletechalModalLabel">Delete Challenge</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -342,7 +342,7 @@
                 <div class="modal-footer">
                     <form action="/admin/deletechal" method="POST">
                         <input type="hidden" name="name" value="" class="name">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" method="POST" class="btn btn-danger">Delete Challenge</button>
                     </form>
                 </div>
@@ -353,9 +353,9 @@
     <div class="modal fade" id="resetpwModal" tabindex="-1" role="dialog" aria-labelledby="resetpwModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header d-flex justify-content-between">
                     <h5 class="modal-title" id="resetpwModalLabel">Password reset</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -365,8 +365,8 @@
                 </div>
                 <div class="modal-footer">
                     <form action="/admin/resetpw" method="POST">
-                        <input type="hidden" name="username" value="" class="username">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <input type="hidden" name="username" class="username">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" method="POST" class="btn btn-danger">Reset password</button>
                     </form>
                 </div>
