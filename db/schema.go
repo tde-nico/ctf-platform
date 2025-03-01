@@ -72,13 +72,6 @@ type GraphData struct {
 	Timestamp time.Time
 }
 
-var CATEGORIES = []string{
-	"Web",
-	"Crypto",
-	"Rev",
-	"Pwn",
-}
-
 var DIFFICULTIES = []string{
 	"Easy",
 	"Medium",

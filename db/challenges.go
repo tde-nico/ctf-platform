@@ -5,6 +5,30 @@ import (
 	"fmt"
 )
 
+func GetCategories() ([]string, error) {
+	query, err := GetStatement("GetCategories")
+	if err != nil {
+		return nil, fmt.Errorf("error getting statement: %v", err)
+	}
+
+	rows, err := query.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	categories := make([]string, 0)
+	for rows.Next() {
+		var category string
+		err = rows.Scan(&category)
+		if err != nil {
+			return nil, err
+		}
+		categories = append(categories, category)
+	}
+	return categories, nil
+}
+
 func ChallengeExistsID(id int) (bool, error) {
 	query, err := GetStatement("ChallengeExistsID")
 	if err != nil {

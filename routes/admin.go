@@ -34,8 +34,12 @@ func admin(ctx *middleware.Ctx) {
 		return
 	}
 
-	data.Categories = db.CATEGORIES
-	data.Categories = append(data.Categories, "Intro")
+	data.Categories, err = db.GetCategories()
+	if err != nil {
+		ctx.InternalError(fmt.Errorf("error getting categories: %v", err))
+		return
+	}
+
 	data.Difficulties = db.DIFFICULTIES
 
 	data.Challenges, err = db.GetChallenges()
@@ -139,7 +143,6 @@ func adminDeleteChall(ctx *middleware.Ctx) {
 
 func adminResetPw(ctx *middleware.Ctx) {
 	username := ctx.FormValue("username")
-	log.Warningf("Reset Password Username: %s", username) //! FIX: username empty
 	password, err := db.ResetPassword(username)
 	if err != nil {
 		log.Errorf("Error resetting password: %v", err)

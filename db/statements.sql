@@ -165,3 +165,7 @@ SELECT u.username, c.points, s.timestamp
 		AND s.userid = u.id
 		AND s.chalid = c.id
 	ORDER BY s.timestamp;
+
+-- GetCategories
+SELECT name
+	FROM categories;

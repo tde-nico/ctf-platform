@@ -1,23 +1,14 @@
 
 Backend:
-	fetchare le categorie da db
 	new features:
 		nuovo ruolo Spectator
 
 Frontend:
-	fixare l'end of page, tipo in config di /admin (non arriva correttamente in fondo)
 	togliere lo scomparire e riapparire della scheda della flag se la flag è sbagliata
-	forse: spostare la X dei flash a destra e dargli uno stile
-	fixare la X del resetpassword dal pannello admin
-
-	templ ?
-	alpine.js ?
-	htmx ?
 
 
 Entambi:
 	consolidare login (rimovere il route GET di login?)
-	fixare reset-password dal pannello admin (il campo username arriva vuoto dal form)
 	
 	Feature Future:
 		batch update hidden challenges
