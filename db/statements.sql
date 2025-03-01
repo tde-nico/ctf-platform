@@ -100,10 +100,15 @@ SELECT category, COUNT(id), SUM(is_extra)
 	GROUP BY category;
 
 -- GetUsersScores
-SELECT id, username, score
-	FROM users
-	WHERE is_admin = 0
-	ORDER BY score DESC;
+SELECT u.id, u.username, u.score
+	FROM users AS u
+	LEFT JOIN (
+		SELECT userid, MAX(timestamp) AS last_submission
+		FROM submissions
+		GROUP BY userid
+	) AS s ON u.id = s.userid
+	WHERE u.is_admin = 0
+	ORDER BY u.score DESC, s.last_submission ASC;
 
 -- GetUserSolves
 SELECT c.name, c.category, c.is_extra, s.timestamp
