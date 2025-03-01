@@ -1,4 +1,5 @@
 import sqlite3
+import os
 
 db = sqlite3.connect('database.db')
 
@@ -40,3 +41,12 @@ for i in range(len(configs)):
 	])
 	db.commit()
 
+db.execute("INSERT INTO keys values (?, ?)", [
+	'secret-key',
+	os.urandom(32).hex(),
+])
+db.execute("INSERT INTO keys values (?, ?)", [
+	'telegram--key',
+	'',
+])
+db.commit()
