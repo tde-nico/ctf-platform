@@ -121,18 +121,18 @@ body {
     font-family: 'ProggyTinyTT', sans-serif;
     font-size: 1.5em;
 }
-.chall-medium {
+.chall-Medium {
     box-shadow: 0 0 5px 1px #fab387;
     background: linear-gradient(45deg, #181825 90%, #fab387 120%);
 }
-.chall-medium:hover {
+.chall-Medium:hover {
     border-color: #fab387;
 }
-.chall-hard {
+.chall-Hard {
     box-shadow: 0 0 5px 1px #d20f39;
     background: linear-gradient(45deg, #181825 90%, #d20f39 120%);
 }
-.chall-hard:hover {
+.chall-Hard:hover {
     border-color: #d20f39;
 }
 @keyframes flash {
