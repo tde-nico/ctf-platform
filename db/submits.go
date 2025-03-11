@@ -5,6 +5,7 @@ import (
 	"platform/log"
 	"platform/telegram_bot"
 	"platform/utils"
+	"sync"
 )
 
 const (
@@ -13,6 +14,8 @@ const (
 	StatusCorrectFlag
 	StatusFirstBlood
 )
+
+var SerializeSolves sync.Mutex
 
 func GetSubmissions() ([]Submission, error) {
 	query, err := GetStatement("GetSubmissions")
@@ -97,6 +100,9 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 
 		return StatusAlreadySolved, fmt.Errorf("challenge already solved")
 	}
+
+	SerializeSolves.Lock()
+	defer SerializeSolves.Unlock()
 
 	chal, err := getChallIfCorrectFlag(chalID, flag)
 	if err != nil {
