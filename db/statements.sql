@@ -54,7 +54,7 @@ UPDATE challenges
 		host = ?,
 		port = ?,
 		category = ?,
-		files = ?,
+		files = CASE WHEN ? != '' THEN ? ELSE files END,
 		flag = ?,
 		hint1 = ?,
 		hint2 = ?,

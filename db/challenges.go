@@ -187,6 +187,7 @@ func UpdateChallenge(chal *Challenge) error {
 		chal.Port,
 		chal.Category,
 		chal.Files,
+		chal.Files,
 		chal.Flag,
 		chal.Hint1,
 		chal.Hint2,
