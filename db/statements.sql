@@ -114,7 +114,8 @@ SELECT u.id, b.name, b.desc, b.extra
 SELECT c.name, c.category, c.is_extra, s.timestamp
 	FROM solves AS s, challenges AS c
 	WHERE s.chalid = c.id
-		AND s.userid = ?;
+		AND s.userid = ?
+	ORDER BY s.timestamp DESC;
 
 -- IsChallengeSolved
 SELECT *

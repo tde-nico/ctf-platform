@@ -88,6 +88,9 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 		return StatusWrongFlag, fmt.Errorf("error getting statement: %v", err)
 	}
 
+	SerializeSolves.Lock()
+	defer SerializeSolves.Unlock()
+
 	status, err := isChallengeSolved(user, chalID)
 	if err != nil {
 		return StatusWrongFlag, err
@@ -100,9 +103,6 @@ func SubmitFlag(user *User, chalID int, flag string) (int, error) {
 
 		return StatusAlreadySolved, fmt.Errorf("challenge already solved")
 	}
-
-	SerializeSolves.Lock()
-	defer SerializeSolves.Unlock()
 
 	chal, err := getChallIfCorrectFlag(chalID, flag)
 	if err != nil {

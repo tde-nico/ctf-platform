@@ -25,5 +25,5 @@ func InitStore(key []byte) {
 
 	store.Options.Path = "/"
 	store.Options.Secure = false
-	store.Options.SameSite = http.SameSiteDefaultMode
+	store.Options.SameSite = http.SameSiteStrictMode
 }
